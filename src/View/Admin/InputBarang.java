@@ -6,6 +6,7 @@ package View.Admin;
 
 import Controller.ControllerBarang;
 import Model.Barang.ModelBarang;
+import Model.User.UserSession;
 import View.Component.AppButtonFactory;
 import View.Component.AppFrame;
 import View.Component.AppLabelFactory;
@@ -254,11 +255,11 @@ public class InputBarang extends AppFrame {
 
         add(panel);
 
-        btnSimpan.addActionListener(_ -> simpanData());
+        btnSimpan.addActionListener(event -> simpanData());
 
-        btnReset.addActionListener(_ -> resetForm());
+        btnReset.addActionListener(event -> resetForm());
 
-        btnBack.addActionListener(_ -> {
+        btnBack.addActionListener(event -> {
             dispose();
             new DashboardAdmin().setVisible(true);
         });
@@ -293,8 +294,8 @@ public class InputBarang extends AppFrame {
                 String.valueOf(cbStatusClaim.getSelectedItem())
         );
 
-        // sementara hardcode user
-        barang.setUserId(1);
+        int currentUserId = UserSession.getCurrentUserId();
+        barang.setUserId(currentUserId == 0 ? 1 : currentUserId);
 
         ControllerBarang controller =
                 new ControllerBarang();

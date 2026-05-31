@@ -18,6 +18,10 @@ public class ModelBarang {
     private String status;
     private String statusClaim;
     private int userId;
+    private int claimedByUserId;
+    private int pendingClaimCount;
+    private String ownerName;
+    private String claimedByName;
     private String createdAt;
 
     public int getId() {
@@ -82,6 +86,38 @@ public class ModelBarang {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public int getClaimedByUserId() {
+        return claimedByUserId;
+    }
+
+    public void setClaimedByUserId(int claimedByUserId) {
+        this.claimedByUserId = claimedByUserId;
+    }
+
+    public int getPendingClaimCount() {
+        return pendingClaimCount;
+    }
+
+    public void setPendingClaimCount(int pendingClaimCount) {
+        this.pendingClaimCount = pendingClaimCount;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public String getClaimedByName() {
+        return claimedByName;
+    }
+
+    public void setClaimedByName(String claimedByName) {
+        this.claimedByName = claimedByName;
     }
     
     public String getCreatedAt() {

@@ -16,6 +16,7 @@ public final class AppTheme {
     public static final Color TEXT_PRIMARY = new Color(44, 62, 80);
     public static final Color TEXT_SECONDARY = new Color(127, 140, 141);
     public static final Color TEXT_ON_PRIMARY = Color.WHITE;
+    public static final Color TEXT_ON_LIGHT = new Color(44, 62, 80);
     public static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 22);
     public static final Font SECTION_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 20);
     public static final Font CARD_TITLE_FONT = new Font("Segoe UI", Font.BOLD, 16);

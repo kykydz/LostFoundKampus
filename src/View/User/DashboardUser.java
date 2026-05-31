@@ -30,7 +30,7 @@ public class DashboardUser extends AppFrame {
 
         AppHeader header = new AppHeader(
                 "DASHBOARD USER",
-                "Kelola pelaporan barang dan lihat daftar barang"
+                "Input barang hilang/temuan lalu ajukan claim dari daftar barang"
         );
 
         JButton btnLihatBarang = AppButtonFactory.primary("LIHAT BARANG");

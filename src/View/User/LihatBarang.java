@@ -5,8 +5,11 @@
 package View.User;
 
 import Controller.ControllerBarang;
+import Controller.ControllerClaimRequest;
 import Model.Barang.ModelBarang;
 import Model.Barang.ModelTableBarang;
+import Model.Claim.ModelClaimRequest;
+import Model.User.UserSession;
 import View.Component.AppButtonFactory;
 import View.Component.AppFrame;
 import View.Component.AppLabelFactory;
@@ -61,6 +64,15 @@ public class LihatBarang extends AppFrame {
                 30
         );
 
+        JButton btnClaim = AppButtonFactory.warning("CLAIM");
+
+        btnClaim.setBounds(
+                560,
+                70,
+                100,
+                30
+        );
+
         tableBarang = new JTable();
         AppTableFactory.style(tableBarang);
 
@@ -80,6 +92,7 @@ public class LihatBarang extends AppFrame {
         panel.add(txtSearch);
         panel.add(btnSearch);
         panel.add(btnRefresh);
+        panel.add(btnClaim);
         panel.add(scroll);
 
         add(panel);
@@ -92,6 +105,8 @@ public class LihatBarang extends AppFrame {
             txtSearch.setText("");
             loadTable();
         });
+
+        btnClaim.addActionListener(e -> claimSelectedBarang());
 
         txtSearch.addKeyListener(
                 new java.awt.event.KeyAdapter() {
@@ -134,5 +149,65 @@ public class LihatBarang extends AppFrame {
                 new ModelTableBarang(list);
 
         tableBarang.setModel(model);
+    }
+
+    private void claimSelectedBarang() {
+        int selectedRow = tableBarang.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih barang yang ingin diklaim terlebih dahulu");
+            return;
+        }
+
+        int currentUserId = UserSession.getCurrentUserId();
+        if (currentUserId == 0) {
+            JOptionPane.showMessageDialog(this, "Silakan login kembali untuk mengajukan claim");
+            return;
+        }
+
+        int barangId = Integer.parseInt(tableBarang.getValueAt(selectedRow, 0).toString());
+        ControllerBarang controllerBarang = new ControllerBarang();
+        ModelBarang barang = controllerBarang.getById(barangId);
+
+        if (barang == null) {
+            JOptionPane.showMessageDialog(this, "Data barang tidak ditemukan");
+            return;
+        }
+
+        if (barang.getUserId() == currentUserId) {
+            JOptionPane.showMessageDialog(this, "Barang milik Anda sendiri tidak perlu diajukan claim");
+            return;
+        }
+
+        if ("Sudah Diklaim".equalsIgnoreCase(barang.getStatusClaim())) {
+            JOptionPane.showMessageDialog(this, "Barang ini sudah diklaim");
+            return;
+        }
+
+        ControllerClaimRequest controllerClaimRequest = new ControllerClaimRequest();
+        if (controllerClaimRequest.existsPendingRequest(barangId, currentUserId)) {
+            JOptionPane.showMessageDialog(this, "Anda sudah mengajukan claim untuk barang ini");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Ajukan claim untuk barang: " + barang.getNamaBarang() + "?",
+                "Konfirmasi Claim",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        ModelClaimRequest request = new ModelClaimRequest();
+        request.setBarangId(barangId);
+        request.setRequesterUserId(currentUserId);
+        request.setStatus("Pending");
+
+        controllerClaimRequest.insert(request);
+        JOptionPane.showMessageDialog(this, "Claim berhasil diajukan dan menunggu persetujuan admin");
+        loadTable();
     }
 }

@@ -11,6 +11,7 @@ package Controller;
 
 import Model.User.DAOUser;
 import Model.User.ModelUser;
+import Model.User.UserSession;
 import java.util.Arrays;
 
 public class ControllerLogin {
@@ -71,6 +72,8 @@ public class ControllerLogin {
                 view.showErrorMessage("Username / Password salah");
                 return;
             }
+
+            UserSession.setCurrentUser(user);
 
             view.showInfoMessage("Login berhasil");
 

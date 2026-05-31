@@ -33,17 +33,49 @@ CREATE TABLE IF NOT EXISTS barang (
 	status_claim ENUM('Belum Diklaim', 'Sudah Diklaim', 'Sudah Ditemukan')
 		NOT NULL DEFAULT 'Belum Diklaim',
 	user_id INT NOT NULL,
+	claimed_by_user_id INT NULL,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT fk_barang_user
 		FOREIGN KEY (user_id) REFERENCES users(id)
 		ON UPDATE CASCADE
 		ON DELETE RESTRICT
+	,
+	CONSTRAINT fk_barang_claimed_by_user
+		FOREIGN KEY (claimed_by_user_id) REFERENCES users(id)
+		ON UPDATE CASCADE
+		ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS claim_requests (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	barang_id INT NOT NULL,
+	requester_user_id INT NOT NULL,
+	status ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending',
+	reviewed_by_user_id INT NULL,
+	requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	reviewed_at TIMESTAMP NULL DEFAULT NULL,
+	CONSTRAINT fk_claim_requests_barang
+		FOREIGN KEY (barang_id) REFERENCES barang(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT fk_claim_requests_requester
+		FOREIGN KEY (requester_user_id) REFERENCES users(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE,
+	CONSTRAINT fk_claim_requests_reviewer
+		FOREIGN KEY (reviewed_by_user_id) REFERENCES users(id)
+		ON UPDATE CASCADE
+		ON DELETE SET NULL
 );
 
 CREATE INDEX idx_barang_user_id ON barang(user_id);
+CREATE INDEX idx_barang_claimed_by_user_id ON barang(claimed_by_user_id);
 CREATE INDEX idx_barang_status ON barang(status);
 CREATE INDEX idx_barang_kategori ON barang(kategori);
+CREATE INDEX idx_claim_requests_barang_id ON claim_requests(barang_id);
+CREATE INDEX idx_claim_requests_requester_user_id ON claim_requests(requester_user_id);
+CREATE INDEX idx_claim_requests_status ON claim_requests(status);
 
 -- Seed users
 INSERT INTO users (id, username, password, nama, role)

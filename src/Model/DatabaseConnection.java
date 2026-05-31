@@ -34,7 +34,9 @@ public class DatabaseConnection {
 
             DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 
-            return DriverManager.getConnection(url, user, pass);
+            Connection activeConnection = DriverManager.getConnection(url, user, pass);
+            DatabaseSchemaManager.ensureClaimWorkflowSchema(activeConnection);
+            return activeConnection;
 
         } catch (Exception e) {
             System.out.println("Koneksi gagal : " + e.getMessage());

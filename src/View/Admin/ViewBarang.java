@@ -5,8 +5,13 @@
 package View.Admin;
 
 import Controller.ControllerBarang;
+import Controller.ControllerClaimRequest;
+import Model.Claim.ModelClaimRequest;
 import Model.Barang.ModelBarang;
 import Model.Barang.ModelTableBarang;
+import Model.User.DAOUser;
+import Model.User.ModelUser;
+import Model.User.UserSession;
 import View.Component.AppButtonFactory;
 import View.Component.AppFrame;
 import View.Component.AppLabelFactory;
@@ -46,6 +51,9 @@ public class ViewBarang extends AppFrame {
         JButton btnDelete = AppButtonFactory.danger("DELETE");
         btnDelete.setBounds(560,70,100,30);
 
+        JButton btnReviewClaim = AppButtonFactory.warning("REVIEW CLAIM");
+        btnReviewClaim.setBounds(680,70,130,30);
+
         tableBarang = new JTable();
         AppTableFactory.style(tableBarang);
 
@@ -58,20 +66,22 @@ public class ViewBarang extends AppFrame {
         panel.add(btnSearch);
         panel.add(btnRefresh);
         panel.add(btnDelete);
+        panel.add(btnReviewClaim);
         panel.add(scroll);
         
         add(panel);
 
         loadTable();
 
-        btnSearch.addActionListener(_ -> searchData());
+        btnSearch.addActionListener(event -> searchData());
 
-        btnRefresh.addActionListener(_ -> {
+        btnRefresh.addActionListener(event -> {
             txtSearch.setText("");
             loadTable();
         });
         
-        btnDelete.addActionListener(_ -> deleteData());
+        btnDelete.addActionListener(event -> deleteData());
+        btnReviewClaim.addActionListener(event -> reviewClaim());
 
         txtSearch.addKeyListener(
                 new java.awt.event.KeyAdapter() {
@@ -113,5 +123,137 @@ public class ViewBarang extends AppFrame {
         JOptionPane.showMessageDialog(this, "Data berhasil dihapus");
         
         loadTable();
+    }
+
+    private void reviewClaim() {
+        int row = tableBarang.getSelectedRow();
+
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih data barang terlebih dahulu");
+            return;
+        }
+
+        int barangId = Integer.parseInt(tableBarang.getValueAt(row, 0).toString());
+        ControllerBarang controllerBarang = new ControllerBarang();
+        ModelBarang barang = controllerBarang.getById(barangId);
+
+        if (barang == null) {
+            JOptionPane.showMessageDialog(this, "Data barang tidak ditemukan");
+            return;
+        }
+
+        ControllerClaimRequest controllerClaimRequest = new ControllerClaimRequest();
+        java.util.List<ModelClaimRequest> pendingRequests = controllerClaimRequest.getPendingRequestsByBarang(barangId);
+
+        if (!pendingRequests.isEmpty()) {
+            ModelClaimRequest request = choosePendingRequest(pendingRequests);
+            if (request == null) {
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Setujui claim dari " + request.getRequesterName() + " untuk barang " + request.getBarangName() + "?",
+                    "Persetujuan Claim",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            int adminUserId = UserSession.getCurrentUserId();
+            controllerClaimRequest.approveRequest(request.getId(), adminUserId == 0 ? 1 : adminUserId);
+            JOptionPane.showMessageDialog(this, "Claim berhasil disetujui");
+            loadTable();
+            return;
+        }
+
+        ModelUser selectedUser = chooseUserForManualClaim(barang);
+        if (selectedUser == null) {
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Admin akan langsung menandai barang ini diklaim oleh " + selectedUser.getNama() + ". Lanjutkan?",
+                "Manual Claim",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        int adminUserId = UserSession.getCurrentUserId();
+        controllerClaimRequest.manualClaim(barangId, selectedUser.getId(), adminUserId == 0 ? 1 : adminUserId);
+        JOptionPane.showMessageDialog(this, "Barang berhasil diklaim secara manual");
+        loadTable();
+    }
+
+    private ModelClaimRequest choosePendingRequest(List<ModelClaimRequest> pendingRequests) {
+        String[] options = pendingRequests.stream()
+                .map(request -> request.getRequesterName() + " (@" + request.getRequesterUsername() + ") - " + request.getRequestedAt())
+                .toArray(String[]::new);
+
+        String selected = (String) JOptionPane.showInputDialog(
+                this,
+                "Pilih request claim yang akan ditinjau",
+                "Daftar Claim Pending",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (selected == null) {
+            return null;
+        }
+
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].equals(selected)) {
+                return pendingRequests.get(i);
+            }
+        }
+
+        return null;
+    }
+
+    private ModelUser chooseUserForManualClaim(ModelBarang barang) {
+        java.util.List<ModelUser> users = new DAOUser().getAll().stream()
+                .filter(user -> "user".equalsIgnoreCase(user.getRole()))
+                .filter(user -> user.getId() != barang.getUserId())
+                .toList();
+
+        if (users.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Tidak ada user yang dapat dipilih untuk claim manual");
+            return null;
+        }
+
+        String[] options = users.stream()
+                .map(user -> user.getNama() + " (@" + user.getUsername() + ")")
+                .toArray(String[]::new);
+
+        String selected = (String) JOptionPane.showInputDialog(
+                this,
+                "Tidak ada request pending. Pilih user untuk claim manual",
+                "Manual Claim",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (selected == null) {
+            return null;
+        }
+
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].equals(selected)) {
+                return users.get(i);
+            }
+        }
+
+        return null;
     }
 }

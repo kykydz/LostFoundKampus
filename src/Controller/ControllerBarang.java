@@ -33,8 +33,16 @@ public class ControllerBarang {
         return daoBarang.getAll();
     }
 
+    public List<ModelBarang> getAllByUserId(int userId) {
+        return daoBarang.getAllByUserId(userId);
+    }
+
     public List<ModelBarang> search(String keyword){
         return daoBarang.search(keyword);
+    }
+
+    public List<ModelBarang> searchByUserId(int userId, String keyword) {
+        return daoBarang.searchByUserId(userId, keyword);
     }
     
     public ModelBarang getById(int id){

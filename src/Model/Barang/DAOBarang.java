@@ -146,6 +146,25 @@ public class DAOBarang implements InterfaceDAOBarang {
         return barang;
     }
 
+    @Override
+    public int getTotalBarang() {
+        return getCountByQuery("SELECT COUNT(*) FROM barang");
+    }
+
+    @Override
+    public int getTotalByStatus(String status) {
+        return getCountByQuery("SELECT COUNT(*) FROM barang WHERE status = ?", status);
+    }
+
+    @Override
+    public List<ModelBarang> getReturnedBarang() {
+        String query = SELECT_BARANG_COLUMNS
+                + " WHERE b.status_claim = ?"
+                + SELECT_BARANG_GROUP_BY
+                + " ORDER BY b.id DESC";
+        return getBarangByQuery(query, "Sudah Ditemukan");
+    }
+
     private List<ModelBarang> getBarangByQuery(String query, Object... parameters) {
         List<ModelBarang> list = new ArrayList<>();
         try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -161,6 +180,23 @@ public class DAOBarang implements InterfaceDAOBarang {
             System.out.println(e.getMessage());
         }
         return list;
+    }
+
+    private int getCountByQuery(String query, Object... parameters) {
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            for (int i = 0; i < parameters.length; i++) {
+                ps.setObject(i + 1, parameters[i]);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return 0;
     }
 
     private ModelBarang mapBarang(ResultSet rs) throws SQLException {

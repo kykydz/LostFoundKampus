@@ -26,4 +26,10 @@ public interface InterfaceDAOBarang {
     public List<ModelBarang> searchByUserId(int userId, String keyword);
     
     public ModelBarang getById(int id);
+
+    public int getTotalBarang();
+
+    public int getTotalByStatus(String status);
+
+    public List<ModelBarang> getReturnedBarang();
 }

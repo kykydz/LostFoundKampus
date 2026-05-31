@@ -4,6 +4,14 @@
  */
 package View.Admin;
 
+import Controller.ControllerBarang;
+import Model.Barang.ModelBarang;
+import Model.User.UserSession;
+import View.Component.AppButtonFactory;
+import View.Component.AppFrame;
+import View.Component.AppLabelFactory;
+import View.Component.AppTheme;
+import javax.swing.*;
 
 /**
  *
@@ -15,55 +23,41 @@ import View.Components.CustomButton;
 import Controller.ControllerBarang;
 import Model.Barang.ModelBarang;
 
-import javax.swing.*;
-import java.awt.*;
+public class InputBarang extends AppFrame {
 
-public class InputBarang extends JFrame {
+    private final JTextField txtNamaBarang;
 
-    private JTextField tfNama;
+    private final JComboBox<String> cbKategori;
 
-    private JComboBox<String> cbKategori;
+    private final JTextArea txtDeskripsi;
 
-    private JTextField tfLokasi;
+    private final JTextField txtLokasi;
 
-    private JTextArea taDeskripsi;
+    private final JComboBox<String> cbStatus;
 
-    private JComboBox<String> cbStatus;
-
-    private CustomButton btnSimpan;
-
-    private JButton btnBack;
-    
-    private ControllerBarang controller;
+    private final JComboBox<String> cbStatusClaim;
 
     public InputBarang() {
-        controller = new ControllerBarang();
-        initComponents();
+        this(null);
     }
 
-    private void initComponents() {
-
-        setTitle("Input Barang");
-
-        setSize(1200,700);
-
-        setLocationRelativeTo(null);
+    public InputBarang(JFrame parentFrame) {
+        super("Input Barang", AppTheme.WINDOW_FORM, parentFrame);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        setLayout(new BorderLayout());
+        panel.setLayout(null);
+        panel.setBackground(AppTheme.BACKGROUND);
+        
 
-        add(new Sidebar(this), BorderLayout.WEST);
+        JLabel title = AppLabelFactory.sectionTitle("INPUT BARANG");
 
-        JPanel mainPanel = new JPanel(
-                new BorderLayout()
-        );
+        title.setBounds(150,20,250,30);
 
-        mainPanel.setBackground(
-                new Color(241,245,249)
-        );
-
-        add(mainPanel, BorderLayout.CENTER);
+        JLabel lblNama =
+                new JLabel("Nama Barang");
+        lblNama.setFont(AppTheme.LABEL_FONT);
+        lblNama.setForeground(AppTheme.TEXT_PRIMARY);
 
         // HEADER
         JPanel header = new JPanel(
@@ -78,26 +72,57 @@ public class InputBarang extends JFrame {
                 )
         );
 
-        JLabel lblTitle = new JLabel(
-                "Input Barang"
+        JLabel lblKategori =
+                new JLabel("Kategori");
+        lblKategori.setFont(AppTheme.LABEL_FONT);
+        lblKategori.setForeground(AppTheme.TEXT_PRIMARY);
+
+        lblKategori.setBounds(
+                50,
+                120,
+                120,
+                25
         );
 
-        lblTitle.setFont(
-                new Font("SansSerif", Font.BOLD, 24)
+        cbKategori =
+                new JComboBox<>(
+                        new String[]{
+                                "Elektronik",
+                                "Dokumen",
+                                "Aksesoris",
+                                "Pakaian",
+                                "Kendaraan",
+                                "Peralatan Kuliah"
+                        }
+                );
+
+        cbKategori.setBounds(
+                180,
+                120,
+                220,
+                25
         );
 
-        header.add(lblTitle, BorderLayout.WEST);
+        JLabel lblDeskripsi =
+                new JLabel("Deskripsi");
+        lblDeskripsi.setFont(AppTheme.LABEL_FONT);
+        lblDeskripsi.setForeground(AppTheme.TEXT_PRIMARY);
 
         btnBack = new JButton("← Kembali");
 
-        btnBack.addActionListener(e -> {
+        txtDeskripsi =
+                new JTextArea();
+        txtDeskripsi.setFont(AppTheme.BODY_FONT);
 
             new ViewBarang().setVisible(true);
 
             dispose();
         });
 
-        header.add(btnBack, BorderLayout.EAST);
+        JLabel lblLokasi =
+                new JLabel("Lokasi");
+        lblLokasi.setFont(AppTheme.LABEL_FONT);
+        lblLokasi.setForeground(AppTheme.TEXT_PRIMARY);
 
         mainPanel.add(header, BorderLayout.NORTH);
 
@@ -110,40 +135,83 @@ public class InputBarang extends JFrame {
                 new Color(241,245,249)
         );
 
-        JPanel formCard = new JPanel();
+        JLabel lblStatus =
+                new JLabel("Status");
+        lblStatus.setFont(AppTheme.LABEL_FONT);
+        lblStatus.setForeground(AppTheme.TEXT_PRIMARY);
 
         formCard.setPreferredSize(
                 new Dimension(500,450)
         );
 
-        formCard.setBackground(Color.WHITE);
+        cbStatus =
+                new JComboBox<>(
+                        new String[]{
+                                "Hilang",
+                                "Ditemukan"
+                        }
+                );
 
-        formCard.setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(
-                                new Color(220,220,220)
-                        ),
-                        BorderFactory.createEmptyBorder(
-                                25,25,25,25
-                        )
-                )
+        cbStatus.setBounds(
+                180,
+                300,
+                220,
+                25
         );
 
-        formCard.setLayout(new BoxLayout(
-                formCard,
-                BoxLayout.Y_AXIS
-        ));
+        JLabel lblClaim =
+                new JLabel("Status Claim");
+        lblClaim.setFont(AppTheme.LABEL_FONT);
+        lblClaim.setForeground(AppTheme.TEXT_PRIMARY);
 
         // NAMA
         formCard.add(new JLabel("Nama Barang"));
 
-        formCard.add(Box.createVerticalStrut(8));
+        cbStatusClaim =
+                new JComboBox<>(
+                        new String[]{
+                                "Belum Diklaim",
+                                "Sudah Diklaim",
+                                "Sudah Ditemukan"
+                        }
+                );
 
-        tfNama = new JTextField();
-
-        tfNama.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE,40)
+        cbStatusClaim.setBounds(
+                180,
+                340,
+                220,
+                25
         );
+
+        JButton btnSimpan = AppButtonFactory.success("SIMPAN");
+
+        btnSimpan.setBounds(
+                50,
+                430,
+                120,
+                35
+        );
+        JButton btnReset = AppButtonFactory.warning("RESET");
+
+        btnReset.setBounds(
+                190,
+                430,
+                120,
+                35
+        );
+        JButton btnBack = AppButtonFactory.danger("BACK");
+
+        btnBack.setBounds(
+                330,
+                430,
+                120,
+                35
+        );
+        txtNamaBarang.setFont(AppTheme.BODY_FONT);
+        txtLokasi.setFont(AppTheme.BODY_FONT);
+        cbKategori.setFont(AppTheme.BODY_FONT);
+        cbStatus.setFont(AppTheme.BODY_FONT);
+        cbStatusClaim.setFont(AppTheme.BODY_FONT);
 
         formCard.add(tfNama);
 
@@ -164,21 +232,23 @@ public class InputBarang extends JFrame {
 
             cbKategori.addItem("Pakaian");
 
-            cbKategori.addItem("Lainnya");
+        btnSimpan.addActionListener(event -> simpanData());
 
-            cbKategori.setMaximumSize(
-                    new Dimension(
-                            Integer.MAX_VALUE,
-                            40
-                    )
-            );
+        btnReset.addActionListener(event -> resetForm());
 
-            formCard.add(cbKategori);
-
-        formCard.add(Box.createVerticalStrut(18));
-
-        // LOKASI
-        formCard.add(new JLabel("Lokasi"));
+        btnBack.addActionListener(event -> {
+            if (hasParentFrame()) {
+                backToParent();
+                return;
+            }
+            dispose();
+            if (UserSession.isAdmin()) {
+                new DashboardAdmin().setVisible(true);
+                return;
+            }
+            new View.User.DashboardUser().setVisible(true);
+        });
+    }
 
         formCard.add(Box.createVerticalStrut(8));
 
@@ -188,31 +258,25 @@ public class InputBarang extends JFrame {
                 new Dimension(Integer.MAX_VALUE,40)
         );
 
-        formCard.add(tfLokasi);
+        barang.setKategori(
+                String.valueOf(cbKategori.getSelectedItem())
+        );
 
         formCard.add(Box.createVerticalStrut(18));
 
         // STATUS
         formCard.add(new JLabel("Status"));
 
-        formCard.add(Box.createVerticalStrut(8));
-
-        cbStatus = new JComboBox<>();
-
-        cbStatus.addItem("Hilang");
-
-        cbStatus.addItem("Ditemukan");
-
-        cbStatus.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE,40)
+        barang.setStatus(
+                String.valueOf(cbStatus.getSelectedItem())
         );
 
-        formCard.add(cbStatus);
+        barang.setStatusClaim(
+                String.valueOf(cbStatusClaim.getSelectedItem())
+        );
 
-        formCard.add(Box.createVerticalStrut(18));
-
-        // DESKRIPSI
-        formCard.add(new JLabel("Deskripsi"));
+        int currentUserId = UserSession.getCurrentUserId();
+        barang.setUserId(currentUserId == 0 ? 1 : currentUserId);
 
         formCard.add(Box.createVerticalStrut(8));
 

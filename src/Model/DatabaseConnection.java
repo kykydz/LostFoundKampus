@@ -9,7 +9,6 @@ package Model;
  * @author Ivaa
  */
 
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -17,34 +16,31 @@ public class DatabaseConnection {
 
     private static Connection connection;
 
-    public static Connection getConnection(){
+    public DatabaseConnection() {
+        if (connection == null) {
+            connection = getConnection();
+        }
+    }
+
+    public static Connection getConnection() {
 
         try {
-            String jdbc_driver = "com.mysql.cj.jdbc.Driver";
-            String nama_db = "lostfoundkampus";
-            String url = "jdbc:mysql://localhost:3306/" + nama_db;
-            String user = "root";
-            String pass = "";
+            String dbHost = System.getenv().getOrDefault("DB_HOST", "localhost");
+            String dbPort = System.getenv().getOrDefault("DB_PORT", "3306");
+            String dbName = System.getenv().getOrDefault("DB_NAME", "lostfoundkampus");
+            String user = System.getenv().getOrDefault("DB_USER", "lfk_app");
+            String pass = System.getenv().getOrDefault("DB_PASS", "lfk_app_123");
+            String url = "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName;
 
-            DriverManager.registerDriver(
-                    new com.mysql.cj.jdbc.Driver()
-            );
+            DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 
-            connection =
-                    DriverManager.getConnection(
-                            url,
-                            user,
-                            pass
-                    );
+            Connection activeConnection = DriverManager.getConnection(url, user, pass);
+            DatabaseSchemaManager.ensureClaimWorkflowSchema(activeConnection);
+            return activeConnection;
 
         } catch (Exception e) {
-
-            System.out.println(
-                    "Koneksi gagal : "
-                    + e.getMessage()
-            );
+            System.out.println("Koneksi gagal : " + e.getMessage());
         }
-
-        return connection;
+        return null;
     }
 }

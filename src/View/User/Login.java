@@ -4,232 +4,133 @@
  */
 package View.User;
 
-/**
- *
- * @author Ivaa
- */
-
 import Controller.ControllerLogin;
-import Model.User.ModelUser;
-import View.Components.CustomButton;
+import Controller.LoginViewContract;
+import View.HomeView;
+import View.Admin.DashboardAdmin;
+import View.Component.AppButtonFactory;
+import View.Component.AppContentPanel;
+import View.Component.AppFrame;
+import View.Component.AppTheme;
+import View.Component.LabeledInput;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class Login extends JFrame {
+public class Login extends AppFrame implements LoginViewContract {
 
-    private JTextField tfUsername;
-
-    private JPasswordField pfPassword;
-
-    private CustomButton btnLogin;
-
-    private JButton btnRegister;
-
-    private ControllerLogin controller;
+    private final LabeledInput usernameInput;
+    private final LabeledInput passwordInput;
 
     public Login() {
-
-        controller = new ControllerLogin();
-
-        initComponents();
+        this(null);
     }
 
-    private void initComponents() {
-
-        setTitle("Lost & Found Kampus");
-
-        setSize(950,600);
-
-        setLocationRelativeTo(null);
-
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        setLayout(new GridLayout(1,2));
-
-        JPanel leftPanel = new JPanel();
-
-        leftPanel.setBackground(new Color(241,245,249));
-
-        leftPanel.setLayout(new BoxLayout(
-                leftPanel,
-                BoxLayout.Y_AXIS
-        ));
-
-        leftPanel.add(Box.createVerticalGlue());
-
-        JLabel lblTitle = new JLabel("Lost & Found Kampus");
-
-        lblTitle.setFont(
-                new Font("SansSerif", Font.BOLD, 30)
-        );
-
-        lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        leftPanel.add(lblTitle);
-
-        leftPanel.add(Box.createVerticalStrut(15));
-
-        JLabel lblDesc = new JLabel(
-                "Temukan barangmu, berbagi kebaikan"
-        );
-
-        lblDesc.setFont(
-                new Font("SansSerif", Font.PLAIN, 15)
-        );
-
-        lblDesc.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        leftPanel.add(lblDesc);
-
-        leftPanel.add(Box.createVerticalGlue());
-
-        add(leftPanel);
-
-        JPanel rightPanel = new JPanel(
-                new GridBagLayout()
-        );
-
-        rightPanel.setBackground(Color.WHITE);
-
-        JPanel card = new JPanel();
-
-        card.setPreferredSize(new Dimension(350,320));
-
-        card.setBackground(Color.WHITE);
-
-        card.setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(
-                                new Color(220,220,220)
-                        ),
-                        BorderFactory.createEmptyBorder(
-                                30,30,30,30
-                        )
-                )
-        );
-
-        card.setLayout(new BoxLayout(
-                card,
-                BoxLayout.Y_AXIS
-        ));
-
-        JLabel lblLogin = new JLabel("Masuk ke akun Anda");
-
-        lblLogin.setFont(
-                new Font("SansSerif", Font.BOLD, 22)
-        );
-
-        lblLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        card.add(lblLogin);
-
-        card.add(Box.createVerticalStrut(30));
-
-        card.add(new JLabel("Username"));
-
-        card.add(Box.createVerticalStrut(8));
-
-        tfUsername = new JTextField();
-
-        tfUsername.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE,40)
-        );
-
-        card.add(tfUsername);
-
-        card.add(Box.createVerticalStrut(20));
-
-        card.add(new JLabel("Password"));
-
-        card.add(Box.createVerticalStrut(8));
-
-        pfPassword = new JPasswordField();
-
-        pfPassword.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE,40)
-        );
-
-        card.add(pfPassword);
-
-        card.add(Box.createVerticalStrut(30));
-
-        btnLogin = new CustomButton("LOGIN");
-
-        btnLogin.addActionListener(e -> login());
-
-        card.add(btnLogin);
-
-        card.add(Box.createVerticalStrut(15));
-
-        btnRegister = new JButton(
-                "Belum punya akun? Register"
-        );
-
-        btnRegister.setBorderPainted(false);
-
-        btnRegister.setContentAreaFilled(false);
-
-        btnRegister.setForeground(
-                new Color(37,99,235)
-        );
-
-        btnRegister.addActionListener(e -> {
-
-            new Register().setVisible(true);
-
-            dispose();
-        });
-
-        card.add(btnRegister);
-
-        rightPanel.add(card);
-
-        add(rightPanel);
-
-        setVisible(true);
-    }
-
-    private void login(){
-
-        try {
-
-            String username = tfUsername.getText();
-
-            String password = String.valueOf(
-                    pfPassword.getPassword()
-            );
-
-            ModelUser user = controller.login(
-                    username,
-                    password
-            );
-
-            if(user != null){
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Login berhasil"
-                );
-
-                new DashboardUser(user).setVisible(true);
-
-                dispose();
-
-            }else{
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Username / password salah"
-                );
-            }
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage()
-            );
+    public Login(JFrame parentFrame) {
+        super("Login", AppTheme.WINDOW_AUTH, parentFrame);
+
+        ControllerLogin controller = new ControllerLogin(this);
+
+        JPanel panel = createScreenPanel();
+
+        JPanel form = new AppContentPanel(new GridBagLayout());
+        form.setOpaque(false);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 14, 8, 14);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.weightx = 1.0;
+
+        JLabel title = new JLabel("LOGIN");
+        title.setFont(AppTheme.TITLE_FONT);
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setForeground(AppTheme.PRIMARY);
+
+        usernameInput = LabeledInput.text("Username", 16);
+        passwordInput = LabeledInput.password("Password", 16);
+
+        JButton btnHome = AppButtonFactory.warning("HOME");
+        JButton btnLogin = AppButtonFactory.primary("LOGIN");
+        JButton btnRegister = AppButtonFactory.success("REGISTER");
+        JButton btnCancel = hasParentFrame() ? AppButtonFactory.danger("CANCEL") : null;
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1, hasParentFrame() ? 4 : 3, 12, 0));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(btnHome);
+        buttonPanel.add(btnLogin);
+        buttonPanel.add(btnRegister);
+        if (btnCancel != null) {
+            buttonPanel.add(btnCancel);
         }
+
+        gbc.gridy = 0;
+        form.add(title, gbc);
+
+        gbc.gridy = 1;
+        form.add(usernameInput, gbc);
+
+        gbc.gridy = 2;
+        form.add(passwordInput, gbc);
+
+        gbc.gridy = 3;
+        gbc.insets = new Insets(14, 14, 8, 14);
+        form.add(buttonPanel, gbc);
+
+        panel.add(form, BorderLayout.CENTER);
+        setScreenContent(panel);
+
+        btnLogin.addActionListener(_ ->
+            controller.handleLogin(
+                usernameInput.getText(),
+                passwordInput.getPassword()
+            )
+        );
+
+        btnHome.addActionListener(_ -> openHome());
+
+        btnRegister.addActionListener(_ -> showChildFrame(new Register(this)));
+
+        if (btnCancel != null) {
+            btnCancel.addActionListener(_ -> backToParent());
+        }
+    }
+
+    @Override
+    public void showInfoMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    @Override
+    public void showErrorMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    @Override
+    public void openAdminDashboard() {
+        if (hasParentFrame()) {
+            getParentFrame().dispose();
+        }
+        dispose();
+        new DashboardAdmin().setVisible(true);
+    }
+
+    @Override
+    public void openUserDashboard() {
+        if (hasParentFrame()) {
+            getParentFrame().dispose();
+        }
+        dispose();
+        new DashboardUser().setVisible(true);
+    }
+
+    private void openHome() {
+        if (hasParentFrame()) {
+            backToParent();
+            return;
+        }
+
+        dispose();
+        new HomeView().setVisible(true);
     }
 }

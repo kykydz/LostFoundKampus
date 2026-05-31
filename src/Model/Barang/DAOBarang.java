@@ -16,6 +16,20 @@ import java.sql.PreparedStatement;
  * @author Ivaa
  */
 public class DAOBarang implements InterfaceDAOBarang {
+    private static final String SELECT_BARANG_COLUMNS =
+            "SELECT b.id, b.nama_barang, b.kategori, b.deskripsi, b.lokasi, b.status, b.status_claim, "
+                    + "b.user_id, b.claimed_by_user_id, b.created_at, owner.nama AS owner_nama, "
+                    + "claimer.nama AS claimed_by_nama, "
+                    + "COALESCE(SUM(CASE WHEN cr.status = 'Pending' THEN 1 ELSE 0 END), 0) AS pending_claim_count "
+                    + "FROM barang b "
+                    + "JOIN users owner ON owner.id = b.user_id "
+                    + "LEFT JOIN users claimer ON claimer.id = b.claimed_by_user_id "
+                    + "LEFT JOIN claim_requests cr ON cr.barang_id = b.id ";
+
+    private static final String SELECT_BARANG_GROUP_BY =
+            " GROUP BY b.id, b.nama_barang, b.kategori, b.deskripsi, b.lokasi, b.status, b.status_claim, "
+                    + "b.user_id, b.claimed_by_user_id, b.created_at, owner.nama, claimer.nama ";
+
     Connection connection;
 
     public DAOBarang(){
@@ -88,102 +102,32 @@ public class DAOBarang implements InterfaceDAOBarang {
 
     @Override
     public List<ModelBarang> getAll() {
-        List<ModelBarang> list = new ArrayList<>();
-        try {
-            Statement st = connection.createStatement();
-            String query = "SELECT * FROM barang ORDER BY id DESC";
-            ResultSet rs = st.executeQuery(query);
+        String query = SELECT_BARANG_COLUMNS + SELECT_BARANG_GROUP_BY + " ORDER BY b.id DESC";
+        return getBarangByQuery(query);
+    }
 
-            while(rs.next()){
-                ModelBarang barang = new ModelBarang();
-                barang.setId(
-                        rs.getInt("id")
-                );
-
-                barang.setNamaBarang(
-                        rs.getString("nama_barang")
-                );
-
-                barang.setKategori(
-                        rs.getString("kategori")
-                );
-
-                barang.setDeskripsi(
-                        rs.getString("deskripsi")
-                );
-
-                barang.setLokasi(
-                        rs.getString("lokasi")
-                );
-
-                barang.setStatus(
-                        rs.getString("status")
-                );
-                
-                barang.setStatusClaim(
-                        rs.getString("status_claim")
-                );
-
-                barang.setCreatedAt(
-                    rs.getString("created_at")
-                );
-
-                list.add(barang);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return list;
+    @Override
+    public List<ModelBarang> getAllByUserId(int userId) {
+        String query = SELECT_BARANG_COLUMNS + " WHERE b.user_id = ?" + SELECT_BARANG_GROUP_BY + " ORDER BY b.id DESC";
+        return getBarangByQuery(query, userId);
     }
 
     @Override
     public List<ModelBarang> search(String keyword) {
-        List<ModelBarang> list = new ArrayList<>();
-        try {
-            String query = "SELECT * FROM barang WHERE nama_barang LIKE ? "
-                    + "OR kategori LIKE ? OR lokasi LIKE ?";
+        String cari = "%" + keyword + "%";
+        String query = SELECT_BARANG_COLUMNS
+                + " WHERE b.nama_barang LIKE ? OR b.kategori LIKE ? OR b.lokasi LIKE ?"
+                + SELECT_BARANG_GROUP_BY + " ORDER BY b.id DESC";
+        return getBarangByQuery(query, cari, cari, cari);
+    }
 
-            PreparedStatement ps = connection.prepareStatement(query);
-
-            String cari = "%" + keyword + "%";
-            ps.setString(1,cari);
-            ps.setString(2,cari);
-            ps.setString(3,cari);
-
-            ResultSet rs = ps.executeQuery();
-
-            while(rs.next()){
-                ModelBarang barang = new ModelBarang();
-                barang.setId(
-                        rs.getInt("id")
-                );
-
-                barang.setNamaBarang(
-                        rs.getString("nama_barang")
-                );
-
-                barang.setKategori(
-                        rs.getString("kategori")
-                );
-
-                barang.setDeskripsi(
-                        rs.getString("deskripsi")
-                );
-
-                barang.setLokasi(
-                        rs.getString("lokasi")
-                );
-
-                barang.setStatus(
-                        rs.getString("status")
-                );
-
-                list.add(barang);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return list;
+    @Override
+    public List<ModelBarang> searchByUserId(int userId, String keyword) {
+        String cari = "%" + keyword + "%";
+        String query = SELECT_BARANG_COLUMNS
+                + " WHERE b.user_id = ? AND (b.nama_barang LIKE ? OR b.kategori LIKE ? OR b.lokasi LIKE ?)"
+                + SELECT_BARANG_GROUP_BY + " ORDER BY b.id DESC";
+        return getBarangByQuery(query, userId, cari, cari, cari);
     }
     
     @Override
@@ -193,8 +137,7 @@ public class DAOBarang implements InterfaceDAOBarang {
 
         try {
 
-            String query =
-                    "SELECT * FROM barang WHERE id=?";
+            String query = SELECT_BARANG_COLUMNS + " WHERE b.id=?" + SELECT_BARANG_GROUP_BY;
 
             PreparedStatement ps =
                     connection.prepareStatement(query);
@@ -204,24 +147,48 @@ public class DAOBarang implements InterfaceDAOBarang {
             ResultSet rs = ps.executeQuery();
 
             if(rs.next()){
-
-                barang = new ModelBarang();
-                
-                barang.setId(rs.getInt("id"));
-                barang.setNamaBarang(rs.getString("nama_barang"));
-                barang.setKategori(rs.getString("kategori"));
-                barang.setDeskripsi(rs.getString("deskripsi"));
-                barang.setLokasi(rs.getString("lokasi"));
-                barang.setStatus(rs.getString("status"));
-                barang.setStatusClaim(rs.getString("status_claim"));
-                barang.setUserId(rs.getInt("user_id"));
-                barang.setCreatedAt(rs.getString("created_at"));
+                barang = mapBarang(rs);
             }
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
+        return barang;
+    }
+
+    private List<ModelBarang> getBarangByQuery(String query, Object... parameters) {
+        List<ModelBarang> list = new ArrayList<>();
+        try (PreparedStatement ps = connection.prepareStatement(query)) {
+            for (int i = 0; i < parameters.length; i++) {
+                ps.setObject(i + 1, parameters[i]);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapBarang(rs));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return list;
+    }
+
+    private ModelBarang mapBarang(ResultSet rs) throws SQLException {
+        ModelBarang barang = new ModelBarang();
+        barang.setId(rs.getInt("id"));
+        barang.setNamaBarang(rs.getString("nama_barang"));
+        barang.setKategori(rs.getString("kategori"));
+        barang.setDeskripsi(rs.getString("deskripsi"));
+        barang.setLokasi(rs.getString("lokasi"));
+        barang.setStatus(rs.getString("status"));
+        barang.setStatusClaim(rs.getString("status_claim"));
+        barang.setUserId(rs.getInt("user_id"));
+        barang.setClaimedByUserId(rs.getInt("claimed_by_user_id"));
+        barang.setOwnerName(rs.getString("owner_nama"));
+        barang.setClaimedByName(rs.getString("claimed_by_nama"));
+        barang.setPendingClaimCount(rs.getInt("pending_claim_count"));
+        barang.setCreatedAt(rs.getString("created_at"));
         return barang;
     }
     public int getTotalBarang(){

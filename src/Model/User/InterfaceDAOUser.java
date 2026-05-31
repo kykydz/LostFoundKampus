@@ -15,10 +15,13 @@ public interface InterfaceDAOUser {
 
     public void insert(ModelUser user);
 
-    public ModelUser login(
-            String username,
-            String password
-    );
+    public ModelUser getById(int id);
+
+    public ModelUser getByUsername(String username);
 
     public List<ModelUser> getAll();
+
+    public void update(ModelUser user);
+
+    public void delete(int id);
 }

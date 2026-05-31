@@ -4,61 +4,47 @@
  */
 package View.User;
 
-/**
- *
- * @author Ivaa
- */
 import Controller.ControllerBarang;
+import Controller.ControllerClaimRequest;
 import Model.Barang.ModelBarang;
 import Model.Barang.ModelTableBarang;
-import Model.User.ModelUser;
+import Model.Claim.ModelClaimRequest;
+import Model.User.UserSession;
+import View.Component.AppButtonFactory;
+import View.Component.AppFrame;
+import View.Component.AppLabelFactory;
+import View.Component.AppTableFactory;
+import View.Component.AppTheme;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 
-public class LihatBarang extends JFrame {
+public class LihatBarang extends AppFrame {
 
-    JTable tableBarang;
+    private final JTable tableBarang;
 
-    JTextField txtSearch;
+    private final JTextField txtSearch;
 
-    JButton btnSearch;
-    JButton btnRefresh;
-    JButton btnClaim;
+    public LihatBarang() {
+        this(null);
+    }
 
-    private ModelUser user;
-
-    public LihatBarang(ModelUser user){
-
-        this.user = user;
-
-        setTitle("Lihat Barang");
-
-        setSize(900,550);
-
-        setLocationRelativeTo(null);
+    public LihatBarang(JFrame parentFrame){
+        super("Lihat Barang", AppTheme.WINDOW_TABLE, parentFrame);
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel();
 
         panel.setLayout(null);
+        panel.setBackground(AppTheme.BACKGROUND);
 
-        JLabel title =
-                new JLabel("DAFTAR BARANG");
-
-        title.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        22
-                )
-        );
+        JLabel title = AppLabelFactory.sectionTitle("DAFTAR BARANG");
 
         title.setBounds(320,20,300,30);
 
         txtSearch = new JTextField();
+        AppTableFactory.styleSearchField(txtSearch);
 
         txtSearch.setBounds(
                 50,
@@ -67,8 +53,7 @@ public class LihatBarang extends JFrame {
                 35
         );
 
-        btnSearch =
-                new JButton("SEARCH");
+        JButton btnSearch = AppButtonFactory.primary("SEARCH");
 
         btnSearch.setBounds(
                 320,
@@ -77,8 +62,7 @@ public class LihatBarang extends JFrame {
                 35
         );
 
-        btnRefresh =
-                new JButton("REFRESH");
+        JButton btnRefresh = AppButtonFactory.success("REFRESH");
 
         btnRefresh.setBounds(
                 440,
@@ -98,7 +82,27 @@ public class LihatBarang extends JFrame {
                 35
         );
 
+        JButton btnClaim = AppButtonFactory.warning("CLAIM");
+
+        btnClaim.setBounds(
+                560,
+                70,
+                100,
+                30
+        );
+
+        JButton btnBack = hasParentFrame() ? AppButtonFactory.danger("BACK") : null;
+        if (btnBack != null) {
+            btnBack.setBounds(
+                    680,
+                    70,
+                    100,
+                    30
+            );
+        }
+
         tableBarang = new JTable();
+        AppTableFactory.style(tableBarang);
 
         JScrollPane scroll =
                 new JScrollPane(
@@ -119,29 +123,27 @@ public class LihatBarang extends JFrame {
         panel.add(btnSearch);
 
         panel.add(btnRefresh);
-
         panel.add(btnClaim);
-
+        if (btnBack != null) {
+            panel.add(btnBack);
+        }
         panel.add(scroll);
 
         add(panel);
 
         loadTable();
 
-        // SEARCH
-        btnSearch.addActionListener(
-                e -> searchData()
-        );
+        btnSearch.addActionListener(e -> searchData());
 
-        // REFRESH
-        btnRefresh.addActionListener(
-                e -> {
+        btnRefresh.addActionListener(e -> {
+            txtSearch.setText("");
+            loadTable();
+        });
 
-                    txtSearch.setText("");
-
-                    loadTable();
-                }
-        );
+        btnClaim.addActionListener(e -> claimSelectedBarang());
+        if (btnBack != null) {
+            btnBack.addActionListener(e -> backToParent());
+        }
 
         // LIVE SEARCH
         txtSearch.addKeyListener(
@@ -172,16 +174,6 @@ public class LihatBarang extends JFrame {
                 new ModelTableBarang(list);
 
         tableBarang.setModel(model);
-
-        tableBarang.setRowHeight(30);
-
-        tableBarang.getTableHeader().setBackground(
-                new Color(52,152,219)
-        );
-
-        tableBarang.getTableHeader().setForeground(
-                Color.WHITE
-        );
     }
 
     private void searchData(){
@@ -200,35 +192,63 @@ public class LihatBarang extends JFrame {
         tableBarang.setModel(model);
     }
 
-    private void claimBarang(){
+    private void claimSelectedBarang() {
+        int selectedRow = tableBarang.getSelectedRow();
 
-        int selectedRow =
-                tableBarang.getSelectedRow();
-
-        if(selectedRow == -1){
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Pilih barang terlebih dahulu!"
-            );
-
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih barang yang ingin diklaim terlebih dahulu");
             return;
         }
 
-        // AMBIL ID BARANG DARI KOLOM 0
-        int idBarang =
-                Integer.parseInt(
-                        tableBarang.getValueAt(
-                                selectedRow,
-                                0
-                        ).toString()
-                );
+        int currentUserId = UserSession.getCurrentUserId();
+        if (currentUserId == 0) {
+            JOptionPane.showMessageDialog(this, "Silakan login kembali untuk mengajukan claim");
+            return;
+        }
 
-        // OPEN MODAL CLAIM
-        new ModalClaimBarang(
+        int barangId = Integer.parseInt(tableBarang.getValueAt(selectedRow, 0).toString());
+        ControllerBarang controllerBarang = new ControllerBarang();
+        ModelBarang barang = controllerBarang.getById(barangId);
+
+        if (barang == null) {
+            JOptionPane.showMessageDialog(this, "Data barang tidak ditemukan");
+            return;
+        }
+
+        if (barang.getUserId() == currentUserId) {
+            JOptionPane.showMessageDialog(this, "Barang milik Anda sendiri tidak perlu diajukan claim");
+            return;
+        }
+
+        if ("Sudah Diklaim".equalsIgnoreCase(barang.getStatusClaim())) {
+            JOptionPane.showMessageDialog(this, "Barang ini sudah diklaim");
+            return;
+        }
+
+        ControllerClaimRequest controllerClaimRequest = new ControllerClaimRequest();
+        if (controllerClaimRequest.existsPendingRequest(barangId, currentUserId)) {
+            JOptionPane.showMessageDialog(this, "Anda sudah mengajukan claim untuk barang ini");
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
                 this,
-                idBarang,
-                user.getId()
+                "Ajukan claim untuk barang: " + barang.getNamaBarang() + "?",
+                "Konfirmasi Claim",
+                JOptionPane.YES_NO_OPTION
         );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        ModelClaimRequest request = new ModelClaimRequest();
+        request.setBarangId(barangId);
+        request.setRequesterUserId(currentUserId);
+        request.setStatus("Pending");
+
+        controllerClaimRequest.insert(request);
+        JOptionPane.showMessageDialog(this, "Claim berhasil diajukan dan menunggu persetujuan admin");
+        loadTable();
     }
 }

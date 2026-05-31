@@ -24,6 +24,7 @@ public class ModelTableBarang extends AbstractTableModel {
             "Lokasi",
             "Status",
             "Claim",
+            "Request Claim",
             "Waktu"
     };
 
@@ -51,7 +52,8 @@ public class ModelTableBarang extends AbstractTableModel {
             case 3: return listBarang.get(rowIndex).getLokasi();
             case 4: return listBarang.get(rowIndex).getStatus();
             case 5: return listBarang.get(rowIndex).getStatusClaim();
-            case 6: return listBarang.get(rowIndex).getCreatedAt();
+            case 6: return listBarang.get(rowIndex).getPendingClaimCount();
+            case 7: return listBarang.get(rowIndex).getCreatedAt();
             default: return null;
         }
     } 

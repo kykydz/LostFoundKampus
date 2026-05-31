@@ -4,29 +4,21 @@
  */
 package View.Admin;
 
+import Model.User.UserSession;
+import View.Component.AppButtonFactory;
+import View.Component.AppFrame;
+import View.Component.AppLabelFactory;
+import View.Component.AppTheme;
 import javax.swing.*;
-import java.awt.*;
-/**
- *
- * @author Ivaa
- */
 
-public class DashboardAdmin extends JFrame {
-
-    JButton btnViewBarang;
-    JButton btnInputBarang;
-    JButton btnLogout;
+public class DashboardAdmin extends AppFrame {
 
     public DashboardAdmin() {
-        setTitle("Dashboard Admin");
+        this(null);
+    }
 
-        setSize(900,600);
-
-        setDefaultCloseOperation(
-                JFrame.EXIT_ON_CLOSE
-        );
-
-        setLocationRelativeTo(null);
+    public DashboardAdmin(JFrame parentFrame) {
+        super("Dashboard Admin", AppTheme.WINDOW_DASHBOARD, parentFrame);
 
         setLayout(null);
 
@@ -41,26 +33,14 @@ public class DashboardAdmin extends JFrame {
         sidebar.setBounds(0,0,220,600);
 
         sidebar.setBackground(
-                new Color(44,62,80)
+                AppTheme.SIDEBAR
         );
 
-        JLabel lblMenu =
-                new JLabel("ADMIN MENU");
-
-        lblMenu.setForeground(Color.WHITE);
-
-        lblMenu.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        20
-                )
-        );
+        JLabel lblMenu = AppLabelFactory.inverseSectionTitle("ADMIN MENU");
 
         lblMenu.setBounds(35,30,200,30);
 
-        btnViewBarang =
-                new JButton("VIEW BARANG");
+        JButton btnViewBarang = AppButtonFactory.primary("VIEW BARANG");
 
         btnViewBarang.setBounds(
                 20,
@@ -69,10 +49,7 @@ public class DashboardAdmin extends JFrame {
                 40
         );
 
-        styleButton(btnViewBarang);
-
-        btnInputBarang =
-                new JButton("INPUT BARANG");
+        JButton btnInputBarang = AppButtonFactory.success("INPUT BARANG");
 
         btnInputBarang.setBounds(
                 20,
@@ -81,10 +58,7 @@ public class DashboardAdmin extends JFrame {
                 40
         );
 
-        styleButton(btnInputBarang);
-
-        btnLogout =
-                new JButton("LOGOUT");
+        JButton btnLogout = AppButtonFactory.danger("LOGOUT");
 
         btnLogout.setBounds(
                 20,
@@ -93,13 +67,15 @@ public class DashboardAdmin extends JFrame {
                 40
         );
 
-        btnLogout.setBackground(
-                new Color(231,76,60)
-        );
-
-        btnLogout.setForeground(Color.WHITE);
-
-        btnLogout.setFocusPainted(false);
+        JButton btnBack = hasParentFrame() ? AppButtonFactory.warning("BACK") : null;
+        if (btnBack != null) {
+            btnBack.setBounds(
+                    20,
+                    280,
+                    180,
+                    40
+            );
+        }
 
         sidebar.add(lblMenu);
 
@@ -108,6 +84,9 @@ public class DashboardAdmin extends JFrame {
         sidebar.add(btnInputBarang);
 
         sidebar.add(btnLogout);
+        if (btnBack != null) {
+            sidebar.add(btnBack);
+        }
 
         add(sidebar);
 
@@ -118,29 +97,14 @@ public class DashboardAdmin extends JFrame {
         content.setBounds(220,0,680,600);
 
         content.setBackground(
-                new Color(245,245,245)
+                AppTheme.BACKGROUND
         );
 
         // =========================
         // TITLE DASHBOARD
         // =========================
 
-        JLabel title =
-                new JLabel(
-                        "DASHBOARD ADMIN"
-                );
-
-        title.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        28
-                )
-        );
-
-        title.setForeground(
-                new Color(41,128,185)
-        );
+        JLabel title = AppLabelFactory.title("DASHBOARD ADMIN");
 
         title.setBounds(
                 180,
@@ -163,21 +127,10 @@ public class DashboardAdmin extends JFrame {
         );
 
         card1.setBackground(
-                new Color(52,152,219)
+                AppTheme.PRIMARY
         );
 
-        JLabel lbl1 =
-                new JLabel("Barang Hilang");
-
-        lbl1.setForeground(Color.WHITE);
-
-        lbl1.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        18
-                )
-        );
+        JLabel lbl1 = AppLabelFactory.cardTitle("Barang Hilang");
 
         card1.add(lbl1);
 
@@ -195,21 +148,10 @@ public class DashboardAdmin extends JFrame {
         );
 
         card2.setBackground(
-                new Color(46,204,113)
+                AppTheme.SUCCESS
         );
 
-        JLabel lbl2 =
-                new JLabel("Barang Ditemukan");
-
-        lbl2.setForeground(Color.WHITE);
-
-        lbl2.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        16
-                )
-        );
+        JLabel lbl2 = AppLabelFactory.cardTitle("Barang Ditemukan");
 
         card2.add(lbl2);
 
@@ -227,21 +169,10 @@ public class DashboardAdmin extends JFrame {
         );
 
         card3.setBackground(
-                new Color(241,196,15)
+                AppTheme.WARNING
         );
 
-        JLabel lbl3 =
-                new JLabel("Sudah Diklaim");
-
-        lbl3.setForeground(Color.WHITE);
-
-        lbl3.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        16
-                )
-        );
+        JLabel lbl3 = AppLabelFactory.cardTitle("Sudah Diklaim");
 
         card3.add(lbl3);
 
@@ -249,18 +180,7 @@ public class DashboardAdmin extends JFrame {
         // INFO TEXT
         // =========================
 
-        JLabel info =
-                new JLabel(
-                        "Selamat datang di sistem Lost & Found Kampus"
-                );
-
-        info.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.PLAIN,
-                        16
-                )
-        );
+        JLabel info = AppLabelFactory.body("Selamat datang di sistem Lost & Found Kampus");
 
         info.setBounds(
                 120,
@@ -289,53 +209,19 @@ public class DashboardAdmin extends JFrame {
         // ACTION BUTTON
         // =========================
 
-        btnViewBarang.addActionListener(
-                e -> {
+        btnViewBarang.addActionListener(e -> showChildFrame(new ViewBarang(this)));
 
-                    new ViewBarang()
-                            .setVisible(true);
-                }
-        );
+        btnInputBarang.addActionListener(e -> showChildFrame(new InputBarang(this)));
 
-        btnInputBarang.addActionListener(
-                e -> {
+        if (btnBack != null) {
+            btnBack.addActionListener(e -> backToParent());
+        }
 
-                    new InputBarang()
-                            .setVisible(true);
-                }
-        );
-
-        btnLogout.addActionListener(
-                e -> {
-
-                    dispose();
-
-                    new View.User.Login()
-                            .setVisible(true);
-                }
-        );
+        btnLogout.addActionListener(e -> {
+            UserSession.clear();
+            dispose();
+            new View.User.Login().setVisible(true);
+        });
     }
 
-    // =========================
-    // STYLE BUTTON
-    // =========================
-
-    private void styleButton(JButton button){
-
-        button.setBackground(
-                new Color(52,152,219)
-        );
-
-        button.setForeground(Color.WHITE);
-
-        button.setFocusPainted(false);
-
-        button.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        14
-                )
-        );
-    }
 }

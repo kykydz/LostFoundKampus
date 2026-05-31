@@ -4,77 +4,69 @@
  */
 package View.Admin;
 
+import Controller.ControllerBarang;
+import Controller.ControllerClaimRequest;
+import Model.Claim.ModelClaimRequest;
+import Model.Barang.ModelBarang;
+import Model.Barang.ModelTableBarang;
+import Model.User.DAOUser;
+import Model.User.ModelUser;
+import Model.User.UserSession;
+import View.Component.AppButtonFactory;
+import View.Component.AppFrame;
+import View.Component.AppLabelFactory;
+import View.Component.AppTableFactory;
+import View.Component.AppTheme;
+import javax.swing.*;
+import java.util.List;
 /**
  *
  * @author Ivaa
  */
-import Model.Barang.ModelTableBarang;
-import View.Components.Sidebar;
-import View.Components.CustomButton;
+public class ViewBarang extends AppFrame {
+    private final JTable tableBarang;
 
-import javax.swing.*;
-import java.awt.*;
-import Controller.ControllerBarang;
-import Model.Barang.ModelBarang;
-import java.util.List;
-
-public class ViewBarang extends JFrame {
-
-    private JTable tableBarang;
-
-    private JTextField tfSearch;
-
-    private CustomButton btnTambah;
-
-    private JButton btnEdit;
-
-    private JButton btnHapus;
-
-    private JButton btnRefresh;
-
-    private JButton btnBack;
+    private final JTextField txtSearch;
     
     private ControllerBarang controller;
 
     public ViewBarang() {
-
-        controller = new ControllerBarang();
-
-        initComponents();
-
-        loadTable();
+        this(null);
     }
 
-    private void initComponents() {
+    public ViewBarang(JFrame parentFrame) {
+        super("View Barang", AppTheme.WINDOW_TABLE, parentFrame);
 
-        setTitle("Data Barang");
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBackground(AppTheme.BACKGROUND);
 
-        setSize(1200,700);
+        JLabel title = AppLabelFactory.sectionTitle("DATA BARANG");
+        title.setBounds(300,20,250,30);
 
-        setLocationRelativeTo(null);
+        txtSearch = new JTextField();
+        txtSearch.setBounds(50,70,250,30);
+        AppTableFactory.styleSearchField(txtSearch);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        JButton btnSearch = AppButtonFactory.primary("SEARCH");
+        btnSearch.setBounds(320,70,100,30);
 
-        setLayout(new BorderLayout());
+        JButton btnRefresh = AppButtonFactory.success("REFRESH");
+        btnRefresh.setBounds(440,70,100,30);
 
-        // SIDEBAR
-        add(new Sidebar(this), BorderLayout.WEST);
+        JButton btnDelete = AppButtonFactory.danger("DELETE");
+        btnDelete.setBounds(560,70,100,30);
 
-        // MAIN PANEL
-        JPanel mainPanel = new JPanel(
-                new BorderLayout()
-        );
+        JButton btnReviewClaim = AppButtonFactory.warning("REVIEW CLAIM");
+        btnReviewClaim.setBounds(680,70,130,30);
 
-        mainPanel.setBackground(
-                new Color(241,245,249)
-        );
+        JButton btnBack = hasParentFrame() ? AppButtonFactory.danger("BACK") : null;
+        if (btnBack != null) {
+            btnBack.setBounds(50, 420, 100, 30);
+        }
 
-        add(mainPanel, BorderLayout.CENTER);
-
-        // HEADER
-        JPanel header = new JPanel(
-                new BorderLayout()
-        );
+        tableBarang = new JTable();
+        AppTableFactory.style(tableBarang);
 
         header.setBackground(Color.WHITE);
 
@@ -84,9 +76,18 @@ public class ViewBarang extends JFrame {
                 )
         );
 
-        JLabel lblTitle = new JLabel(
-                "Data Barang"
-        );
+        panel.add(title);
+        panel.add(txtSearch);
+        panel.add(btnSearch);
+        panel.add(btnRefresh);
+        panel.add(btnDelete);
+        panel.add(btnReviewClaim);
+        if (btnBack != null) {
+            panel.add(btnBack);
+        }
+        panel.add(scroll);
+        
+        add(panel);
 
         lblTitle.setFont(
                 new Font("SansSerif", Font.BOLD, 24)
@@ -135,108 +136,27 @@ public class ViewBarang extends JFrame {
                 new Dimension(300,40)
         );
 
-        topPanel.add(tfSearch, BorderLayout.WEST);
-        tfSearch.addKeyListener(
-        new java.awt.event.KeyAdapter() {
+        btnSearch.addActionListener(event -> searchData());
 
-            public void keyReleased(
-                    java.awt.event.KeyEvent evt
-            ){
-
-                searchBarang();
-            }
-        }
-);
-
-        JPanel buttonPanel = new JPanel(
-                new FlowLayout(
-                        FlowLayout.RIGHT
-                )
-        );
-
-        buttonPanel.setOpaque(false);
-
-        btnTambah = new CustomButton(
-                "Tambah Barang"
-        );
-
-        btnTambah.addActionListener(e -> {
-
-            new InputBarang().setVisible(true);
-
-            dispose();
-        });
-
-        buttonPanel.add(btnTambah);
-
-        btnRefresh = new JButton("Refresh");
-
-        buttonPanel.add(btnRefresh);
-        
-        btnRefresh.addActionListener(e -> {
-
+        btnRefresh.addActionListener(event -> {
+            txtSearch.setText("");
             loadTable();
         });
+        
+        btnDelete.addActionListener(event -> deleteData());
+        btnReviewClaim.addActionListener(event -> reviewClaim());
+        if (btnBack != null) {
+            btnBack.addActionListener(event -> backToParent());
+        }
 
         topPanel.add(buttonPanel, BorderLayout.EAST);
 
-        content.add(topPanel, BorderLayout.NORTH);
-
-        // TABLE PANEL
-        JPanel tablePanel = new JPanel(
-                new BorderLayout()
+                    @Override
+                    public void keyReleased(java.awt.event.KeyEvent ignored){
+                        searchData();
+                    }
+                }
         );
-
-        tablePanel.setBackground(Color.WHITE);
-
-        tablePanel.setBorder(
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(
-                                new Color(220,220,220)
-                        ),
-                        BorderFactory.createEmptyBorder(
-                                20,20,20,20
-                        )
-                )
-        );
-
-        tableBarang = new JTable();
-
-        String[][] data = {};
-
-        tableBarang = new JTable(data, columns);
-
-        tableBarang.setRowHeight(32);
-
-        JScrollPane scrollPane =
-                new JScrollPane(tableBarang);
-
-        tablePanel.add(scrollPane, BorderLayout.CENTER);
-
-        // ACTION PANEL
-        JPanel actionPanel = new JPanel(
-                new FlowLayout(
-                        FlowLayout.RIGHT
-                )
-        );
-
-        actionPanel.setBackground(Color.WHITE);
-
-        btnEdit = new JButton("Edit");
-
-        btnHapus = new JButton("Hapus");
-
-        actionPanel.add(btnEdit);
-
-        actionPanel.add(btnHapus);
-
-        tablePanel.add(actionPanel, BorderLayout.SOUTH);
-
-        content.add(tablePanel, BorderLayout.CENTER);
-
-        mainPanel.add(content, BorderLayout.CENTER);
-
-        setVisible(true);
     }
     private void loadTable(){
 
@@ -270,5 +190,154 @@ public class ViewBarang extends JFrame {
                 new ModelTableBarang(list);
 
         tableBarang.setModel(model);
+    }
+    
+    private void deleteData(){
+        int row = tableBarang.getSelectedRow();
+        
+        if(row == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih data dulu!");
+            return;
+        }
+        
+        int id = Integer.parseInt(tableBarang.getValueAt(row, 0).toString());
+        
+        ControllerBarang controller = new ControllerBarang();
+        controller.delete(id);
+        JOptionPane.showMessageDialog(this, "Data berhasil dihapus");
+        
+        loadTable();
+    }
+
+    private void reviewClaim() {
+        int row = tableBarang.getSelectedRow();
+
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih data barang terlebih dahulu");
+            return;
+        }
+
+        int barangId = Integer.parseInt(tableBarang.getValueAt(row, 0).toString());
+        ControllerBarang controllerBarang = new ControllerBarang();
+        ModelBarang barang = controllerBarang.getById(barangId);
+
+        if (barang == null) {
+            JOptionPane.showMessageDialog(this, "Data barang tidak ditemukan");
+            return;
+        }
+
+        ControllerClaimRequest controllerClaimRequest = new ControllerClaimRequest();
+        java.util.List<ModelClaimRequest> pendingRequests = controllerClaimRequest.getPendingRequestsByBarang(barangId);
+
+        if (!pendingRequests.isEmpty()) {
+            ModelClaimRequest request = choosePendingRequest(pendingRequests);
+            if (request == null) {
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Setujui claim dari " + request.getRequesterName() + " untuk barang " + request.getBarangName() + "?",
+                    "Persetujuan Claim",
+                    JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            int adminUserId = UserSession.getCurrentUserId();
+            controllerClaimRequest.approveRequest(request.getId(), adminUserId == 0 ? 1 : adminUserId);
+            JOptionPane.showMessageDialog(this, "Claim berhasil disetujui");
+            loadTable();
+            return;
+        }
+
+        ModelUser selectedUser = chooseUserForManualClaim(barang);
+        if (selectedUser == null) {
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Admin akan langsung menandai barang ini diklaim oleh " + selectedUser.getNama() + ". Lanjutkan?",
+                "Manual Claim",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        int adminUserId = UserSession.getCurrentUserId();
+        controllerClaimRequest.manualClaim(barangId, selectedUser.getId(), adminUserId == 0 ? 1 : adminUserId);
+        JOptionPane.showMessageDialog(this, "Barang berhasil diklaim secara manual");
+        loadTable();
+    }
+
+    private ModelClaimRequest choosePendingRequest(List<ModelClaimRequest> pendingRequests) {
+        String[] options = pendingRequests.stream()
+                .map(request -> request.getRequesterName() + " (@" + request.getRequesterUsername() + ") - " + request.getRequestedAt())
+                .toArray(String[]::new);
+
+        String selected = (String) JOptionPane.showInputDialog(
+                this,
+                "Pilih request claim yang akan ditinjau",
+                "Daftar Claim Pending",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (selected == null) {
+            return null;
+        }
+
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].equals(selected)) {
+                return pendingRequests.get(i);
+            }
+        }
+
+        return null;
+    }
+
+    private ModelUser chooseUserForManualClaim(ModelBarang barang) {
+        java.util.List<ModelUser> users = new DAOUser().getAll().stream()
+                .filter(user -> "user".equalsIgnoreCase(user.getRole()))
+                .filter(user -> user.getId() != barang.getUserId())
+                .toList();
+
+        if (users.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Tidak ada user yang dapat dipilih untuk claim manual");
+            return null;
+        }
+
+        String[] options = users.stream()
+                .map(user -> user.getNama() + " (@" + user.getUsername() + ")")
+                .toArray(String[]::new);
+
+        String selected = (String) JOptionPane.showInputDialog(
+                this,
+                "Tidak ada request pending. Pilih user untuk claim manual",
+                "Manual Claim",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                options,
+                options[0]
+        );
+
+        if (selected == null) {
+            return null;
+        }
+
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].equals(selected)) {
+                return users.get(i);
+            }
+        }
+
+        return null;
     }
 }

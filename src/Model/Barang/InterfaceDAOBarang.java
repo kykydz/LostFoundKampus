@@ -19,7 +19,11 @@ public interface InterfaceDAOBarang {
 
     public List<ModelBarang> getAll();
 
+    public List<ModelBarang> getAllByUserId(int userId);
+
     public List<ModelBarang> search(String keyword);
+
+    public List<ModelBarang> searchByUserId(int userId, String keyword);
     
     public ModelBarang getById(int id);
 }

@@ -15,6 +15,10 @@ public final class AppButtonFactory {
         return create(text, AppTheme.SUCCESS);
     }
 
+    public static JButton warning(String text) {
+        return create(text, AppTheme.WARNING);
+    }
+
     public static JButton danger(String text) {
         return create(text, AppTheme.DANGER);
     }

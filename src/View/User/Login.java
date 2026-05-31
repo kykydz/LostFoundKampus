@@ -4,43 +4,31 @@
  */
 package View.User;
 
-/**
- *
- * @author Ivaa
- */
 import Controller.ControllerLogin;
 import Controller.LoginViewContract;
 import View.Admin.DashboardAdmin;
 import View.Component.AppButtonFactory;
+import View.Component.AppContentPanel;
+import View.Component.AppFrame;
 import View.Component.AppTheme;
 import View.Component.LabeledInput;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 
-public class Login extends JFrame implements LoginViewContract {
+public class Login extends AppFrame implements LoginViewContract {
 
     private final LabeledInput usernameInput;
     private final LabeledInput passwordInput;
-    private final transient ControllerLogin controller;
-
-    private final JButton btnLogin;
-    private final JButton btnRegister;
 
     public Login() {
+        super("Login", AppTheme.WINDOW_AUTH);
 
-        this.controller = new ControllerLogin(this);
+        ControllerLogin controller = new ControllerLogin(this);
 
-        setTitle("Login");
-        setSize(400, 300);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        JPanel panel = createScreenPanel();
 
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(AppTheme.BACKGROUND);
-
-        JPanel form = new JPanel(new GridBagLayout());
+        JPanel form = new AppContentPanel(new GridBagLayout());
         form.setOpaque(false);
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -52,13 +40,13 @@ public class Login extends JFrame implements LoginViewContract {
         JLabel title = new JLabel("LOGIN");
         title.setFont(AppTheme.TITLE_FONT);
         title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setForeground(new Color(41, 128, 185));
+        title.setForeground(AppTheme.PRIMARY);
 
         usernameInput = LabeledInput.text("Username", 16);
         passwordInput = LabeledInput.password("Password", 16);
 
-        btnLogin = AppButtonFactory.primary("LOGIN");
-        btnRegister = AppButtonFactory.success("REGISTER");
+        JButton btnLogin = AppButtonFactory.primary("LOGIN");
+        JButton btnRegister = AppButtonFactory.success("REGISTER");
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 12, 0));
         buttonPanel.setOpaque(false);
@@ -79,25 +67,19 @@ public class Login extends JFrame implements LoginViewContract {
         form.add(buttonPanel, gbc);
 
         panel.add(form, BorderLayout.CENTER);
-        add(panel);
+        setScreenContent(panel);
 
-        btnLogin.addActionListener(loginEventHandler());
-        btnRegister.addActionListener(registerEventHandler());
-    }
-
-    private ActionListener loginEventHandler() {
-        return e -> {
-            this.controller.handleLogin(
+        btnLogin.addActionListener(e ->
+            controller.handleLogin(
                 usernameInput.getText(),
                 passwordInput.getPassword()
-            );
-        };
-    }
+            )
+        );
 
-    private static ActionListener registerEventHandler() {
-        return e -> {
+        btnRegister.addActionListener(e -> {
+            dispose();
             new Register().setVisible(true);
-        };
+        });
     }
 
     @Override

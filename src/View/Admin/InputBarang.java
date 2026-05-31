@@ -6,8 +6,11 @@ package View.Admin;
 
 import Controller.ControllerBarang;
 import Model.Barang.ModelBarang;
+import View.Component.AppButtonFactory;
+import View.Component.AppFrame;
+import View.Component.AppLabelFactory;
+import View.Component.AppTheme;
 import javax.swing.*;
-import java.awt.*;
 
 /**
  *
@@ -15,58 +18,37 @@ import java.awt.*;
  */
 
 
-public class InputBarang extends JFrame {
+public class InputBarang extends AppFrame {
 
-    JTextField txtNamaBarang;
+    private final JTextField txtNamaBarang;
 
-    JComboBox cbKategori;
+    private final JComboBox<String> cbKategori;
 
-    JTextArea txtDeskripsi;
+    private final JTextArea txtDeskripsi;
 
-    JTextField txtLokasi;
+    private final JTextField txtLokasi;
 
-    JComboBox cbStatus;
+    private final JComboBox<String> cbStatus;
 
-    JComboBox cbStatusClaim;
-
-    JButton btnSimpan;
-
-    JButton btnReset;
-
-    JButton btnBack;
-    
-    
+    private final JComboBox<String> cbStatusClaim;
 
     public InputBarang() {
-
-        setTitle("Input Barang");
-
-        setSize(500,550);
-
-        setLocationRelativeTo(null);
+        super("Input Barang", AppTheme.WINDOW_FORM);
 
         JPanel panel = new JPanel();
 
         panel.setLayout(null);
-        panel.setBackground(new Color(245,245,245));
+        panel.setBackground(AppTheme.BACKGROUND);
         
 
-        JLabel title =
-                new JLabel("INPUT BARANG");
-
-        title.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        20
-                )
-        );
+        JLabel title = AppLabelFactory.sectionTitle("INPUT BARANG");
 
         title.setBounds(150,20,250,30);
-        title.setForeground(new Color(41,128,185));
 
         JLabel lblNama =
                 new JLabel("Nama Barang");
+        lblNama.setFont(AppTheme.LABEL_FONT);
+        lblNama.setForeground(AppTheme.TEXT_PRIMARY);
 
         lblNama.setBounds(50,80,120,25);
 
@@ -82,6 +64,8 @@ public class InputBarang extends JFrame {
 
         JLabel lblKategori =
                 new JLabel("Kategori");
+        lblKategori.setFont(AppTheme.LABEL_FONT);
+        lblKategori.setForeground(AppTheme.TEXT_PRIMARY);
 
         lblKategori.setBounds(
                 50,
@@ -91,7 +75,7 @@ public class InputBarang extends JFrame {
         );
 
         cbKategori =
-                new JComboBox(
+                new JComboBox<>(
                         new String[]{
                                 "Elektronik",
                                 "Dokumen",
@@ -111,6 +95,8 @@ public class InputBarang extends JFrame {
 
         JLabel lblDeskripsi =
                 new JLabel("Deskripsi");
+        lblDeskripsi.setFont(AppTheme.LABEL_FONT);
+        lblDeskripsi.setForeground(AppTheme.TEXT_PRIMARY);
 
         lblDeskripsi.setBounds(
                 50,
@@ -121,6 +107,7 @@ public class InputBarang extends JFrame {
 
         txtDeskripsi =
                 new JTextArea();
+        txtDeskripsi.setFont(AppTheme.BODY_FONT);
 
         JScrollPane sp =
                 new JScrollPane(
@@ -136,6 +123,8 @@ public class InputBarang extends JFrame {
 
         JLabel lblLokasi =
                 new JLabel("Lokasi");
+        lblLokasi.setFont(AppTheme.LABEL_FONT);
+        lblLokasi.setForeground(AppTheme.TEXT_PRIMARY);
 
         lblLokasi.setBounds(
                 50,
@@ -156,6 +145,8 @@ public class InputBarang extends JFrame {
 
         JLabel lblStatus =
                 new JLabel("Status");
+        lblStatus.setFont(AppTheme.LABEL_FONT);
+        lblStatus.setForeground(AppTheme.TEXT_PRIMARY);
 
         lblStatus.setBounds(
                 50,
@@ -165,7 +156,7 @@ public class InputBarang extends JFrame {
         );
 
         cbStatus =
-                new JComboBox(
+                new JComboBox<>(
                         new String[]{
                                 "Hilang",
                                 "Ditemukan"
@@ -181,6 +172,8 @@ public class InputBarang extends JFrame {
 
         JLabel lblClaim =
                 new JLabel("Status Claim");
+        lblClaim.setFont(AppTheme.LABEL_FONT);
+        lblClaim.setForeground(AppTheme.TEXT_PRIMARY);
 
         lblClaim.setBounds(
                 50,
@@ -190,7 +183,7 @@ public class InputBarang extends JFrame {
         );
 
         cbStatusClaim =
-                new JComboBox(
+                new JComboBox<>(
                         new String[]{
                                 "Belum Diklaim",
                                 "Sudah Diklaim",
@@ -205,8 +198,7 @@ public class InputBarang extends JFrame {
                 25
         );
 
-        btnSimpan =
-                new JButton("SIMPAN");
+        JButton btnSimpan = AppButtonFactory.success("SIMPAN");
 
         btnSimpan.setBounds(
                 50,
@@ -214,12 +206,7 @@ public class InputBarang extends JFrame {
                 120,
                 35
         );
-        btnSimpan.setBackground(new Color(46,204,113));
-        btnSimpan.setForeground(Color.WHITE);
-        btnSimpan.setFocusPainted(false);
-
-        btnReset =
-                new JButton("RESET");
+        JButton btnReset = AppButtonFactory.warning("RESET");
 
         btnReset.setBounds(
                 190,
@@ -227,12 +214,7 @@ public class InputBarang extends JFrame {
                 120,
                 35
         );
-        btnReset.setBackground(new Color(241,196,15));
-        btnReset.setForeground(Color.WHITE);
-        btnReset.setFocusPainted(false);
-
-        btnBack =
-                new JButton("BACK");
+        JButton btnBack = AppButtonFactory.danger("BACK");
 
         btnBack.setBounds(
                 330,
@@ -240,9 +222,11 @@ public class InputBarang extends JFrame {
                 120,
                 35
         );
-        btnBack.setBackground(new Color(231,76,60));
-        btnBack.setForeground(Color.WHITE);
-        btnBack.setFocusPainted(false);
+        txtNamaBarang.setFont(AppTheme.BODY_FONT);
+        txtLokasi.setFont(AppTheme.BODY_FONT);
+        cbKategori.setFont(AppTheme.BODY_FONT);
+        cbStatus.setFont(AppTheme.BODY_FONT);
+        cbStatusClaim.setFont(AppTheme.BODY_FONT);
 
         panel.add(title);
 
@@ -270,23 +254,14 @@ public class InputBarang extends JFrame {
 
         add(panel);
 
-        btnSimpan.addActionListener(
-                e -> simpanData()
-        );
+        btnSimpan.addActionListener(_ -> simpanData());
 
-        btnReset.addActionListener(
-                e -> resetForm()
-        );
+        btnReset.addActionListener(_ -> resetForm());
 
-        btnBack.addActionListener(
-                e -> {
-
-                    dispose();
-
-                    new DashboardAdmin()
-                            .setVisible(true);
-                }
-        );
+        btnBack.addActionListener(_ -> {
+            dispose();
+            new DashboardAdmin().setVisible(true);
+        });
     }
 
     private void simpanData() {
@@ -299,9 +274,7 @@ public class InputBarang extends JFrame {
         );
 
         barang.setKategori(
-                cbKategori
-                        .getSelectedItem()
-                        .toString()
+                String.valueOf(cbKategori.getSelectedItem())
         );
 
         barang.setDeskripsi(
@@ -313,15 +286,11 @@ public class InputBarang extends JFrame {
         );
 
         barang.setStatus(
-                cbStatus
-                        .getSelectedItem()
-                        .toString()
+                String.valueOf(cbStatus.getSelectedItem())
         );
 
         barang.setStatusClaim(
-                cbStatusClaim
-                        .getSelectedItem()
-                        .toString()
+                String.valueOf(cbStatusClaim.getSelectedItem())
         );
 
         // sementara hardcode user

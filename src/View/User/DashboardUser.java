@@ -4,103 +4,67 @@
  */
 package View.User;
 
-/**
- *
- * @author Ivaa
- */
 import View.Admin.InputBarang;
+import View.Component.AppButtonFactory;
+import View.Component.AppCard;
+import View.Component.AppFrame;
+import View.Component.AppHeader;
+import View.Component.AppTheme;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class DashboardUser extends JFrame {
-
-    JButton btnLihatBarang;
-    JButton btnTambahBarang;
-    JButton btnLogout;
+public class DashboardUser extends AppFrame {
 
     public DashboardUser(){
+        super("Dashboard User", AppTheme.WINDOW_AUTH_REGISTER);
 
-        setTitle("Dashboard User");
-        setSize(400,300);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        JPanel rootPanel = new JPanel(new GridBagLayout());
+        rootPanel.setBackground(AppTheme.BACKGROUND);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
+        AppCard card = new AppCard();
 
-        JLabel title = new JLabel("DASHBOARD USER");
+        JPanel contentPanel = new JPanel();
+        contentPanel.setOpaque(false);
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
-        title.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        20
-                )
+        AppHeader header = new AppHeader(
+                "DASHBOARD USER",
+                "Kelola pelaporan barang dan lihat daftar barang"
         );
 
-        title.setBounds(90,30,250,30);
+        JButton btnLihatBarang = AppButtonFactory.primary("LIHAT BARANG");
+        JButton btnTambahBarang = AppButtonFactory.success("TAMBAH BARANG");
+        JButton btnLogout = AppButtonFactory.danger("LOGOUT");
 
-        btnLihatBarang =
-                new JButton("LIHAT BARANG");
+        Dimension buttonSize = new Dimension(220, 40);
+        btnLihatBarang.setMaximumSize(buttonSize);
+        btnTambahBarang.setMaximumSize(buttonSize);
+        btnLogout.setMaximumSize(buttonSize);
+        btnLihatBarang.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnTambahBarang.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnLogout.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        btnLihatBarang.setBounds(
-                100,
-                90,
-                180,
-                40
-        );
+        contentPanel.add(header);
+        contentPanel.add(Box.createVerticalStrut(28));
+        contentPanel.add(btnLihatBarang);
+        contentPanel.add(Box.createVerticalStrut(14));
+        contentPanel.add(btnTambahBarang);
+        contentPanel.add(Box.createVerticalStrut(14));
+        contentPanel.add(btnLogout);
 
-        btnTambahBarang =
-                new JButton("TAMBAH BARANG");
+        card.setContent(contentPanel);
+        rootPanel.add(card);
 
-        btnTambahBarang.setBounds(
-                100,
-                140,
-                180,
-                40
-        );
+        add(rootPanel);
 
-        btnLogout =
-                new JButton("LOGOUT");
+        btnLihatBarang.addActionListener(e -> new LihatBarang().setVisible(true));
 
-        btnLogout.setBounds(
-                100,
-                190,
-                180,
-                40
-        );
+        btnTambahBarang.addActionListener(e -> new InputBarang().setVisible(true));
 
-        panel.add(title);
-        panel.add(btnLihatBarang);
-        panel.add(btnTambahBarang);
-        panel.add(btnLogout);
-
-        add(panel);
-
-        btnLihatBarang.addActionListener(
-                e -> {
-
-                    new LihatBarang()
-                            .setVisible(true);
-                }
-        );
-
-        btnTambahBarang.addActionListener(
-                e -> {
-
-                    new InputBarang().setVisible(true);
-                }
-        );
-
-        btnLogout.addActionListener(
-                e -> {
-
-                    dispose();
-
-                    new Login()
-                            .setVisible(true);
-                }
-        );
+        btnLogout.addActionListener(e -> {
+            dispose();
+            new Login().setVisible(true);
+        });
     }
 }

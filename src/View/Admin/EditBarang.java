@@ -4,19 +4,23 @@
  */
 package View.Admin;
 
+import View.Component.AppContentPanel;
+import View.Component.AppFrame;
+import View.Component.AppLabelFactory;
+import View.Component.AppTheme;
 import javax.swing.*;
-/**
- *
- * @author Ivaa
- */
-public class EditBarang extends JFrame {
+import java.awt.BorderLayout;
+
+public class EditBarang extends AppFrame {
     public EditBarang() {
-        setTitle("Edit Barang");
-        setSize(400,300);
-        setLocationRelativeTo(null);
+        super("Edit Barang", AppTheme.WINDOW_COMPACT);
 
-        JLabel label = new JLabel("FORM EDIT BARANG");
+        JPanel panel = createScreenPanel();
+        JPanel content = new AppContentPanel(new BorderLayout());
+        JLabel label = AppLabelFactory.sectionTitle("FORM EDIT BARANG");
 
-        add(label);
+        content.add(label, BorderLayout.CENTER);
+        panel.add(content, BorderLayout.CENTER);
+        setScreenContent(panel);
     }
 }

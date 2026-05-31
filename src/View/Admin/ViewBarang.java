@@ -7,50 +7,47 @@ package View.Admin;
 import Controller.ControllerBarang;
 import Model.Barang.ModelBarang;
 import Model.Barang.ModelTableBarang;
+import View.Component.AppButtonFactory;
+import View.Component.AppFrame;
+import View.Component.AppLabelFactory;
+import View.Component.AppTableFactory;
+import View.Component.AppTheme;
 import javax.swing.*;
-import java.awt.*;
 import java.util.List;
 /**
  *
  * @author Ivaa
  */
-public class ViewBarang extends JFrame {
-    JTable tableBarang;
+public class ViewBarang extends AppFrame {
+    private final JTable tableBarang;
 
-    JTextField txtSearch;
-
-    JButton btnSearch;
-    JButton btnRefresh;
-    JButton btnDelete;
+    private final JTextField txtSearch;
     
     public ViewBarang() {
-        setTitle("View Barang");
-        setSize(800,500);
-        setLocationRelativeTo(null);
+        super("View Barang", AppTheme.WINDOW_TABLE);
 
         JPanel panel = new JPanel();
         panel.setLayout(null);
+        panel.setBackground(AppTheme.BACKGROUND);
 
-        JLabel title = new JLabel("DATA BARANG");
-        title.setFont(new Font("Segoe UI",Font.BOLD,20));
+        JLabel title = AppLabelFactory.sectionTitle("DATA BARANG");
         title.setBounds(300,20,250,30);
 
         txtSearch = new JTextField();
         txtSearch.setBounds(50,70,250,30);
+        AppTableFactory.styleSearchField(txtSearch);
 
-        btnSearch = new JButton("SEARCH");
+        JButton btnSearch = AppButtonFactory.primary("SEARCH");
         btnSearch.setBounds(320,70,100,30);
 
-        btnRefresh = new JButton("REFRESH");
+        JButton btnRefresh = AppButtonFactory.success("REFRESH");
         btnRefresh.setBounds(440,70,100,30);
 
-        btnDelete = new JButton("DELETE");
+        JButton btnDelete = AppButtonFactory.danger("DELETE");
         btnDelete.setBounds(560,70,100,30);
 
         tableBarang = new JTable();
-        tableBarang.getTableHeader().setBackground(new Color(52,152,219));
-        tableBarang.setRowHeight(25);
-        tableBarang.getTableHeader().setForeground(Color.WHITE);
+        AppTableFactory.style(tableBarang);
 
         JScrollPane scroll = new JScrollPane(tableBarang);
 
@@ -67,28 +64,23 @@ public class ViewBarang extends JFrame {
 
         loadTable();
 
-        btnSearch.addActionListener(e -> searchData());
+        btnSearch.addActionListener(_ -> searchData());
 
-        btnRefresh.addActionListener(e -> {
+        btnRefresh.addActionListener(_ -> {
             txtSearch.setText("");
             loadTable();
         });
         
-        btnDelete.addActionListener(e -> deleteData());
+        btnDelete.addActionListener(_ -> deleteData());
 
         txtSearch.addKeyListener(
                 new java.awt.event.KeyAdapter() {
 
-                    public void keyReleased(java.awt.event.KeyEvent evt){
+                    @Override
+                    public void keyReleased(java.awt.event.KeyEvent ignored){
                         searchData();
                     }
                 }
-        );
-        txtSearch.setBorder(
-        BorderFactory.createLineBorder(
-        new Color(52,152,219),
-        2
-            )
         );
     }
     

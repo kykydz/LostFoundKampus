@@ -4,119 +4,86 @@
  */
 package View.User;
 
-/**
- *
- * @author Ivaa
- */
-
 import Controller.ControllerUser;
 import Model.User.ModelUser;
+import View.Component.AppButtonFactory;
+import View.Component.AppContentPanel;
+import View.Component.AppFrame;
+import View.Component.AppTheme;
+import View.Component.LabeledInput;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class Register extends JFrame {
+public class Register extends AppFrame {
 
-    JTextField txtNama;
-    JTextField txtUsername;
-    JPasswordField txtPassword;
-
-    JButton btnRegister;
-    JButton btnLogin;
+    private final LabeledInput namaInput;
+    private final LabeledInput usernameInput;
+    private final LabeledInput passwordInput;
 
     public Register(){
+        super("Register", AppTheme.WINDOW_AUTH_REGISTER);
 
-        setTitle("Register");
-        setSize(400,350);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        JPanel panel = createScreenPanel();
 
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
+        JPanel form = new AppContentPanel(new GridBagLayout());
+        form.setOpaque(false);
 
-        JLabel title =
-                new JLabel("REGISTER");
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 14, 8, 14);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.weightx = 1.0;
 
-        title.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        22
-                )
-        );
+        JLabel title = new JLabel("REGISTER");
+        title.setFont(AppTheme.TITLE_FONT);
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setForeground(AppTheme.PRIMARY);
 
-        title.setBounds(120,20,200,30);
+        namaInput = LabeledInput.text("Nama", 16);
+        usernameInput = LabeledInput.text("Username", 16);
+        passwordInput = LabeledInput.password("Password", 16);
 
-        JLabel lblNama =
-                new JLabel("Nama");
+        JButton btnRegister = AppButtonFactory.success("REGISTER");
+        JButton btnLogin = AppButtonFactory.primary("LOGIN");
 
-        lblNama.setBounds(50,80,100,25);
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 12, 0));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(btnRegister);
+        buttonPanel.add(btnLogin);
 
-        txtNama = new JTextField();
+        gbc.gridy = 0;
+        form.add(title, gbc);
 
-        txtNama.setBounds(150,80,180,25);
+        gbc.gridy = 1;
+        form.add(namaInput, gbc);
 
-        JLabel lblUsername =
-                new JLabel("Username");
+        gbc.gridy = 2;
+        form.add(usernameInput, gbc);
 
-        lblUsername.setBounds(50,120,100,25);
+        gbc.gridy = 3;
+        form.add(passwordInput, gbc);
 
-        txtUsername =
-                new JTextField();
+        gbc.gridy = 4;
+        gbc.insets = new Insets(14, 14, 8, 14);
+        form.add(buttonPanel, gbc);
 
-        txtUsername.setBounds(150,120,180,25);
+        panel.add(form, BorderLayout.CENTER);
+        setScreenContent(panel);
 
-        JLabel lblPassword =
-                new JLabel("Password");
+        btnRegister.addActionListener(e -> register());
 
-        lblPassword.setBounds(50,160,100,25);
-
-        txtPassword =
-                new JPasswordField();
-
-        txtPassword.setBounds(150,160,180,25);
-
-        btnRegister =
-                new JButton("REGISTER");
-
-        btnRegister.setBounds(60,230,120,35);
-
-        btnLogin =
-                new JButton("LOGIN");
-
-        btnLogin.setBounds(200,230,120,35);
-
-        panel.add(title);
-        panel.add(lblNama);
-        panel.add(txtNama);
-        panel.add(lblUsername);
-        panel.add(txtUsername);
-        panel.add(lblPassword);
-        panel.add(txtPassword);
-        panel.add(btnRegister);
-        panel.add(btnLogin);
-
-        add(panel);
-
-        btnRegister.addActionListener(
-                e -> register()
-        );
-
-        btnLogin.addActionListener(
-                e -> {
-
-                    dispose();
-
-                    new Login().setVisible(true);
-                }
-        );
+        btnLogin.addActionListener(e -> {
+            dispose();
+            new Login().setVisible(true);
+        });
     }
 
     private void register(){
 
-        if(txtNama.getText().isEmpty()
-                || txtUsername.getText().isEmpty()
-                || txtPassword.getText().isEmpty()){
+        if(namaInput.getText().isEmpty()
+                || usernameInput.getText().isEmpty()
+                || passwordInput.getPassword().length == 0){
 
             JOptionPane.showMessageDialog(
                     this,
@@ -130,15 +97,15 @@ public class Register extends JFrame {
                 new ModelUser();
 
         user.setNama(
-                txtNama.getText()
+                namaInput.getText()
         );
 
         user.setUsername(
-                txtUsername.getText()
+                usernameInput.getText()
         );
 
         user.setPassword(
-                txtPassword.getText()
+                new String(passwordInput.getPassword())
         );
 
         ControllerUser controller =

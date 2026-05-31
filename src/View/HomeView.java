@@ -8,6 +8,7 @@ import Controller.ControllerHome;
 import Controller.HomeViewContract;
 import View.Component.AppButtonFactory;
 import View.Component.AppCard;
+import View.Component.AppFrame;
 import View.Component.AppHeader;
 import View.Component.AppTheme;
 import View.User.Login;
@@ -18,16 +19,13 @@ import java.awt.*;
  *
  * @author Ivaa
  */
-public class HomeView extends JFrame implements HomeViewContract {
+public class HomeView extends AppFrame implements HomeViewContract {
 
     public HomeView(){
+        super("Lost & Found Kampus", AppTheme.WINDOW_HOME);
 
         ControllerHome controller = new ControllerHome(this);
 
-        setTitle("Lost & Found Kampus");
-        setSize(500,400);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
 
         JPanel rootPanel = new JPanel(new GridBagLayout());
         rootPanel.setBackground(AppTheme.BACKGROUND);

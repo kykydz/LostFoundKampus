@@ -90,22 +90,17 @@ public class Register extends AppFrame {
         }
     }
 
-    private void register(){
+        card.add(tfNama);
 
         if(namaInput.getText().isEmpty()
                 || usernameInput.getText().isEmpty()
                 || passwordInput.getPassword().length == 0){
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Data tidak boleh kosong"
-            );
+        card.add(new JLabel("Username"));
 
-            return;
-        }
+        card.add(Box.createVerticalStrut(8));
 
-        ModelUser user =
-                new ModelUser();
+        tfUsername = new JTextField();
 
         user.setNama(
                 namaInput.getText()
@@ -119,14 +114,22 @@ public class Register extends AppFrame {
                 new String(passwordInput.getPassword())
         );
 
-        ControllerUser controller =
-                new ControllerUser();
+        card.add(pfConfirm);
 
-        controller.insert(user);
+        card.add(Box.createVerticalStrut(28));
 
-        JOptionPane.showMessageDialog(
-                this,
-                "Register berhasil"
+        btnRegister = new CustomButton(
+                "REGISTER"
+        );
+
+        btnRegister.addActionListener(e -> register());
+
+        card.add(btnRegister);
+
+        card.add(Box.createVerticalStrut(15));
+
+        btnBack = new JButton(
+                "← Kembali ke Login"
         );
 
         openLoginScreen();
@@ -144,6 +147,43 @@ public class Register extends AppFrame {
             return;
         }
 
-        new Login().setVisible(true);
+        rightPanel.add(card);
+
+        add(rightPanel);
+
+        setVisible(true);
+    }
+
+    private void register() {
+
+        try {
+
+            controller.register(
+                    tfNama.getText(),
+                    tfUsername.getText(),
+                    String.valueOf(
+                            pfPassword.getPassword()
+                    ),
+                    String.valueOf(
+                            pfConfirm.getPassword()
+                    )
+            );
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Register berhasil!"
+            );
+
+            new Login().setVisible(true);
+
+            dispose();
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage()
+            );
+        }
     }
 }

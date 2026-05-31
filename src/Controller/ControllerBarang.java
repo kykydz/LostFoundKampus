@@ -48,4 +48,16 @@ public class ControllerBarang {
     public ModelBarang getById(int id){
         return daoBarang.getById(id);
     }
+    public int getTotalBarang(){
+
+        return daoBarang.getTotalBarang();
+    }
+    public int getTotalByStatus(String status){
+
+        return daoBarang.getTotalByStatus(status);
+    }
+    public List<ModelBarang> getReturnedBarang(){
+        
+        return daoBarang.getReturnedBarang();
+    }
 }

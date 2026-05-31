@@ -32,13 +32,16 @@ public class LihatBarang extends AppFrame {
     public LihatBarang(JFrame parentFrame){
         super("Lihat Barang", AppTheme.WINDOW_TABLE, parentFrame);
 
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
         JPanel panel = new JPanel();
+
         panel.setLayout(null);
         panel.setBackground(AppTheme.BACKGROUND);
 
         JLabel title = AppLabelFactory.sectionTitle("DAFTAR BARANG");
 
-        title.setBounds(280,20,250,30);
+        title.setBounds(320,20,300,30);
 
         txtSearch = new JTextField();
         AppTableFactory.styleSearchField(txtSearch);
@@ -47,7 +50,7 @@ public class LihatBarang extends AppFrame {
                 50,
                 70,
                 250,
-                30
+                35
         );
 
         JButton btnSearch = AppButtonFactory.primary("SEARCH");
@@ -56,7 +59,7 @@ public class LihatBarang extends AppFrame {
                 320,
                 70,
                 100,
-                30
+                35
         );
 
         JButton btnRefresh = AppButtonFactory.success("REFRESH");
@@ -65,7 +68,18 @@ public class LihatBarang extends AppFrame {
                 440,
                 70,
                 100,
-                30
+                35
+        );
+
+        // BUTTON CLAIM
+        btnClaim =
+                new JButton("Klaim Barang");
+
+        btnClaim.setBounds(
+                650,
+                70,
+                170,
+                35
         );
 
         JButton btnClaim = AppButtonFactory.warning("CLAIM");
@@ -98,13 +112,16 @@ public class LihatBarang extends AppFrame {
         scroll.setBounds(
                 50,
                 130,
-                680,
-                280
+                780,
+                320
         );
 
         panel.add(title);
+
         panel.add(txtSearch);
+
         panel.add(btnSearch);
+
         panel.add(btnRefresh);
         panel.add(btnClaim);
         if (btnBack != null) {
@@ -128,6 +145,7 @@ public class LihatBarang extends AppFrame {
             btnBack.addActionListener(e -> backToParent());
         }
 
+        // LIVE SEARCH
         txtSearch.addKeyListener(
                 new java.awt.event.KeyAdapter() {
 
@@ -139,6 +157,9 @@ public class LihatBarang extends AppFrame {
                     }
                 }
         );
+
+        // CLAIM BUTTON
+        btnClaim.addActionListener(e -> claimBarang());
     }
 
     private void loadTable(){

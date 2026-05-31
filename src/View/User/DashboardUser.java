@@ -13,7 +13,9 @@ import View.Component.AppHeader;
 import View.Component.AppTheme;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 public class DashboardUser extends AppFrame {
 
@@ -86,4 +88,36 @@ public class DashboardUser extends AppFrame {
             new Login().setVisible(true);
         });
     }
+
+    // =========================
+    // LOAD TABLE
+    // =========================
+
+    private void loadTable(DefaultTableModel model){
+
+        model.setRowCount(0);
+
+        List<ModelBarang> list =
+                controller.getAll();
+
+        for(ModelBarang barang : list){
+
+            Object[] row = {
+
+                    barang.getId(),
+
+                    barang.getNamaBarang(),
+
+                    barang.getKategori(),
+
+                    barang.getLokasi(),
+
+                    barang.getStatus()
+            };
+
+            model.addRow(row);
+        }
+    }
+
+    
 }

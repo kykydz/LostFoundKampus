@@ -11,7 +11,7 @@ import javax.swing.table.AbstractTableModel;
  * @author Ivaa
  */
 public class ModelTableBarang extends AbstractTableModel {
-    List<ModelBarang> listBarang;
+    private List<ModelBarang> listBarang;
 
     public ModelTableBarang(List<ModelBarang> listBarang){
         this.listBarang = listBarang;

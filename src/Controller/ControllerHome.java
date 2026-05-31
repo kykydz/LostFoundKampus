@@ -1,5 +1,7 @@
 package Controller;
 
+import java.awt.event.ActionEvent;
+
 public class ControllerHome {
 
     private final HomeViewContract view;
@@ -16,12 +18,20 @@ public class ControllerHome {
         view.openLogin();
     }
 
+    public void handleOpenLogin(ActionEvent event) {
+        handleOpenLogin();
+    }
+
     public void handleOpenRegister() {
         if (view == null) {
             return;
         }
 
         view.openRegister();
+    }
+
+    public void handleOpenRegister(ActionEvent event) {
+        handleOpenRegister();
     }
 
     public void handleExit() {
@@ -32,6 +42,10 @@ public class ControllerHome {
         if (view.confirmExit()) {
             view.exitApplication();
         }
+    }
+
+    public void handleExit(ActionEvent event) {
+        handleExit();
     }
 }
 

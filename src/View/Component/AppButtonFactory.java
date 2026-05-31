@@ -15,6 +15,10 @@ public final class AppButtonFactory {
         return create(text, AppTheme.SUCCESS);
     }
 
+    public static JButton danger(String text) {
+        return create(text, AppTheme.DANGER);
+    }
+
     private static JButton create(String text, java.awt.Color background) {
         JButton button = new JButton(text);
         button.setBackground(background);

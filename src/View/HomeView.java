@@ -6,133 +6,75 @@ package View;
 
 import Controller.ControllerHome;
 import Controller.HomeViewContract;
+import View.Component.AppButtonFactory;
+import View.Component.AppCard;
+import View.Component.AppHeader;
+import View.Component.AppTheme;
 import View.User.Login;
 import View.User.Register;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import javax.swing.border.LineBorder;
 /**
  *
  * @author Ivaa
  */
 public class HomeView extends JFrame implements HomeViewContract {
 
-    private final transient ControllerHome controller;
-    private final JButton btnLogin;
-    private final JButton btnRegister;
-    private final JButton btnExit;
-
     public HomeView(){
 
-        this.controller = new ControllerHome(this);
+        ControllerHome controller = new ControllerHome(this);
 
         setTitle("Lost & Found Kampus");
         setSize(500,400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
+        JPanel rootPanel = new JPanel(new GridBagLayout());
+        rootPanel.setBackground(AppTheme.BACKGROUND);
 
-        panel.setBackground(new Color(44,62,80));
+        AppCard card = new AppCard();
 
-        JLabel title = new JLabel("LOST & FOUND KAMPUS");
+        JPanel contentPanel = new JPanel();
+        contentPanel.setOpaque(false);
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
-        title.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        24
-                )
+        AppHeader header = new AppHeader(
+                "LOST & FOUND KAMPUS",
+                "Aplikasi Barang Hilang & Ditemukan",
+                AppTheme.TEXT_PRIMARY,
+                AppTheme.TEXT_SECONDARY
         );
 
-        title.setForeground(Color.WHITE);
-        title.setBounds(95,40,320,40);
+        JButton btnLogin = AppButtonFactory.primary("LOGIN");
+        JButton btnRegister = AppButtonFactory.success("REGISTER");
+        JButton btnExit = AppButtonFactory.danger("EXIT");
 
-        JLabel subtitle =
-                new JLabel(
-                        "Aplikasi Barang Hilang & Ditemukan"
-                );
+        Dimension buttonSize = new Dimension(220, 40);
+        btnLogin.setMaximumSize(buttonSize);
+        btnRegister.setMaximumSize(buttonSize);
+        btnExit.setMaximumSize(buttonSize);
+        btnLogin.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnRegister.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnExit.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        subtitle.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.PLAIN,
-                        16
-                )
-        );
+        contentPanel.add(header);
+        contentPanel.add(Box.createVerticalStrut(28));
+        contentPanel.add(btnLogin);
+        contentPanel.add(Box.createVerticalStrut(14));
+        contentPanel.add(btnRegister);
+        contentPanel.add(Box.createVerticalStrut(14));
+        contentPanel.add(btnExit);
 
-        subtitle.setForeground(Color.WHITE);
-        subtitle.setBounds(105,90,320,30);
+        card.setContent(contentPanel);
+        rootPanel.add(card);
 
-        btnLogin = new JButton("LOGIN");
+        add(rootPanel);
 
-        btnLogin.setBounds(
-                150,
-                160,
-                180,
-                40
-        );
-
-        styleButton(btnLogin);
-
-        btnRegister = new JButton("REGISTER");
-
-        btnRegister.setBounds(
-                150,
-                220,
-                180,
-                40
-        );
-
-        styleButton(btnRegister);
-
-        btnExit = new JButton("EXIT");
-
-        btnExit.setBounds(
-                150,
-                280,
-                180,
-                40
-        );
-        styleButton(btnExit);
-
-        panel.add(title);
-        panel.add(subtitle);
-        panel.add(btnLogin);
-        panel.add(btnRegister);
-        panel.add(btnExit);
-
-        add(panel);
-
-        btnLogin.addActionListener(loginEventHandler());
-        btnRegister.addActionListener(registerEventHandler());
-        btnExit.addActionListener(exitEventHandler());
+        btnLogin.addActionListener(controller::handleOpenLogin);
+        btnRegister.addActionListener(controller::handleOpenRegister);
+        btnExit.addActionListener(controller::handleExit);
     }
 
-    private ActionListener loginEventHandler() {
-        return e -> controller.handleOpenLogin();
-    }
-
-    private ActionListener registerEventHandler() {
-        return e -> controller.handleOpenRegister();
-    }
-
-    private ActionListener exitEventHandler() {
-        return e -> controller.handleExit();
-    }
-
-    private void styleButton(JButton button){
-        button.setBackground(Color.WHITE);
-        button.setForeground(new Color(44,62,80));
-        button.setFont( new Font("Segoe UI", Font.BOLD, 14));
-
-        button.setFocusPainted(false);
-        button.setOpaque(true);
-        button.setBorderPainted(false);
-        button.setBorder( new LineBorder(Color.WHITE, 1, true ));
-    }
 
     @Override
     public void openLogin() {

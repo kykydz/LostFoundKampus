@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 
-import View.Home;
+import View.HomeView;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 /**
@@ -23,7 +23,7 @@ public class Main {
 
         // Jalankan GUI di Event Dispatch Thread (EDT) — aturan baku Swing
         SwingUtilities.invokeLater(() -> {
-            new Home().setVisible(true); // Buka jendela Login pertama kali
+            new HomeView().setVisible(true); // Buka halaman awal aplikasi
         });
     }
 }

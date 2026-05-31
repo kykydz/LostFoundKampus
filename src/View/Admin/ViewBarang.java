@@ -29,7 +29,11 @@ public class ViewBarang extends AppFrame {
     private final JTextField txtSearch;
     
     public ViewBarang() {
-        super("View Barang", AppTheme.WINDOW_TABLE);
+        this(null);
+    }
+
+    public ViewBarang(JFrame parentFrame) {
+        super("View Barang", AppTheme.WINDOW_TABLE, parentFrame);
 
         JPanel panel = new JPanel();
         panel.setLayout(null);
@@ -54,6 +58,11 @@ public class ViewBarang extends AppFrame {
         JButton btnReviewClaim = AppButtonFactory.warning("REVIEW CLAIM");
         btnReviewClaim.setBounds(680,70,130,30);
 
+        JButton btnBack = hasParentFrame() ? AppButtonFactory.danger("BACK") : null;
+        if (btnBack != null) {
+            btnBack.setBounds(50, 420, 100, 30);
+        }
+
         tableBarang = new JTable();
         AppTableFactory.style(tableBarang);
 
@@ -67,6 +76,9 @@ public class ViewBarang extends AppFrame {
         panel.add(btnRefresh);
         panel.add(btnDelete);
         panel.add(btnReviewClaim);
+        if (btnBack != null) {
+            panel.add(btnBack);
+        }
         panel.add(scroll);
         
         add(panel);
@@ -82,6 +94,9 @@ public class ViewBarang extends AppFrame {
         
         btnDelete.addActionListener(event -> deleteData());
         btnReviewClaim.addActionListener(event -> reviewClaim());
+        if (btnBack != null) {
+            btnBack.addActionListener(event -> backToParent());
+        }
 
         txtSearch.addKeyListener(
                 new java.awt.event.KeyAdapter() {

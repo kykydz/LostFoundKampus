@@ -34,7 +34,11 @@ public class InputBarang extends AppFrame {
     private final JComboBox<String> cbStatusClaim;
 
     public InputBarang() {
-        super("Input Barang", AppTheme.WINDOW_FORM);
+        this(null);
+    }
+
+    public InputBarang(JFrame parentFrame) {
+        super("Input Barang", AppTheme.WINDOW_FORM, parentFrame);
 
         JPanel panel = new JPanel();
 
@@ -260,8 +264,16 @@ public class InputBarang extends AppFrame {
         btnReset.addActionListener(event -> resetForm());
 
         btnBack.addActionListener(event -> {
+            if (hasParentFrame()) {
+                backToParent();
+                return;
+            }
             dispose();
-            new DashboardAdmin().setVisible(true);
+            if (UserSession.isAdmin()) {
+                new DashboardAdmin().setVisible(true);
+                return;
+            }
+            new View.User.DashboardUser().setVisible(true);
         });
     }
 

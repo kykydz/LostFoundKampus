@@ -4,6 +4,7 @@
  */
 package View.Admin;
 
+import Model.User.UserSession;
 import View.Component.AppButtonFactory;
 import View.Component.AppFrame;
 import View.Component.AppLabelFactory;
@@ -13,7 +14,11 @@ import javax.swing.*;
 public class DashboardAdmin extends AppFrame {
 
     public DashboardAdmin() {
-        super("Dashboard Admin", AppTheme.WINDOW_DASHBOARD);
+        this(null);
+    }
+
+    public DashboardAdmin(JFrame parentFrame) {
+        super("Dashboard Admin", AppTheme.WINDOW_DASHBOARD, parentFrame);
 
         setLayout(null);
 
@@ -62,6 +67,16 @@ public class DashboardAdmin extends AppFrame {
                 40
         );
 
+        JButton btnBack = hasParentFrame() ? AppButtonFactory.warning("BACK") : null;
+        if (btnBack != null) {
+            btnBack.setBounds(
+                    20,
+                    280,
+                    180,
+                    40
+            );
+        }
+
         sidebar.add(lblMenu);
 
         sidebar.add(btnViewBarang);
@@ -69,6 +84,9 @@ public class DashboardAdmin extends AppFrame {
         sidebar.add(btnInputBarang);
 
         sidebar.add(btnLogout);
+        if (btnBack != null) {
+            sidebar.add(btnBack);
+        }
 
         add(sidebar);
 
@@ -191,11 +209,16 @@ public class DashboardAdmin extends AppFrame {
         // ACTION BUTTON
         // =========================
 
-        btnViewBarang.addActionListener(e -> new ViewBarang().setVisible(true));
+        btnViewBarang.addActionListener(e -> showChildFrame(new ViewBarang(this)));
 
-        btnInputBarang.addActionListener(e -> new InputBarang().setVisible(true));
+        btnInputBarang.addActionListener(e -> showChildFrame(new InputBarang(this)));
+
+        if (btnBack != null) {
+            btnBack.addActionListener(e -> backToParent());
+        }
 
         btnLogout.addActionListener(e -> {
+            UserSession.clear();
             dispose();
             new View.User.Login().setVisible(true);
         });

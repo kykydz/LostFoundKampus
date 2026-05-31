@@ -25,8 +25,12 @@ public class LihatBarang extends AppFrame {
 
     private final JTextField txtSearch;
 
-    public LihatBarang(){
-        super("Lihat Barang", AppTheme.WINDOW_TABLE);
+    public LihatBarang() {
+        this(null);
+    }
+
+    public LihatBarang(JFrame parentFrame){
+        super("Lihat Barang", AppTheme.WINDOW_TABLE, parentFrame);
 
         JPanel panel = new JPanel();
         panel.setLayout(null);
@@ -73,6 +77,16 @@ public class LihatBarang extends AppFrame {
                 30
         );
 
+        JButton btnBack = hasParentFrame() ? AppButtonFactory.danger("BACK") : null;
+        if (btnBack != null) {
+            btnBack.setBounds(
+                    680,
+                    70,
+                    100,
+                    30
+            );
+        }
+
         tableBarang = new JTable();
         AppTableFactory.style(tableBarang);
 
@@ -93,6 +107,9 @@ public class LihatBarang extends AppFrame {
         panel.add(btnSearch);
         panel.add(btnRefresh);
         panel.add(btnClaim);
+        if (btnBack != null) {
+            panel.add(btnBack);
+        }
         panel.add(scroll);
 
         add(panel);
@@ -107,6 +124,9 @@ public class LihatBarang extends AppFrame {
         });
 
         btnClaim.addActionListener(e -> claimSelectedBarang());
+        if (btnBack != null) {
+            btnBack.addActionListener(e -> backToParent());
+        }
 
         txtSearch.addKeyListener(
                 new java.awt.event.KeyAdapter() {

@@ -21,8 +21,12 @@ public class Register extends AppFrame {
     private final LabeledInput usernameInput;
     private final LabeledInput passwordInput;
 
-    public Register(){
-        super("Register", AppTheme.WINDOW_AUTH_REGISTER);
+    public Register() {
+        this(null);
+    }
+
+    public Register(JFrame parentFrame){
+        super("Register", AppTheme.WINDOW_AUTH_REGISTER, parentFrame);
 
         JPanel panel = createScreenPanel();
 
@@ -46,11 +50,15 @@ public class Register extends AppFrame {
 
         JButton btnRegister = AppButtonFactory.success("REGISTER");
         JButton btnLogin = AppButtonFactory.primary("LOGIN");
+        JButton btnCancel = hasParentFrame() ? AppButtonFactory.danger("CANCEL") : null;
 
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 12, 0));
+        JPanel buttonPanel = new JPanel(new GridLayout(1, hasParentFrame() ? 3 : 2, 12, 0));
         buttonPanel.setOpaque(false);
         buttonPanel.add(btnRegister);
         buttonPanel.add(btnLogin);
+        if (btnCancel != null) {
+            buttonPanel.add(btnCancel);
+        }
 
         gbc.gridy = 0;
         form.add(title, gbc);
@@ -74,9 +82,12 @@ public class Register extends AppFrame {
         btnRegister.addActionListener(e -> register());
 
         btnLogin.addActionListener(e -> {
-            dispose();
-            new Login().setVisible(true);
+            openLoginScreen();
         });
+
+        if (btnCancel != null) {
+            btnCancel.addActionListener(e -> backToParent());
+        }
     }
 
     private void register(){
@@ -118,7 +129,20 @@ public class Register extends AppFrame {
                 "Register berhasil"
         );
 
+        openLoginScreen();
+    }
+
+    private void openLoginScreen() {
+        if (hasParentFrame() && getParentFrame() instanceof Login) {
+            backToParent();
+            return;
+        }
+
         dispose();
+        if (hasParentFrame()) {
+            new Login(getParentFrame()).setVisible(true);
+            return;
+        }
 
         new Login().setVisible(true);
     }

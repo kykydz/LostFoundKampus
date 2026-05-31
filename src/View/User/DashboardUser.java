@@ -4,6 +4,7 @@
  */
 package View.User;
 
+import Model.User.UserSession;
 import View.Admin.InputBarang;
 import View.Component.AppButtonFactory;
 import View.Component.AppCard;
@@ -16,8 +17,12 @@ import java.awt.*;
 
 public class DashboardUser extends AppFrame {
 
-    public DashboardUser(){
-        super("Dashboard User", AppTheme.WINDOW_AUTH_REGISTER);
+    public DashboardUser() {
+        this(null);
+    }
+
+    public DashboardUser(JFrame parentFrame){
+        super("Dashboard User", AppTheme.WINDOW_AUTH_REGISTER, parentFrame);
 
         JPanel rootPanel = new JPanel(new GridBagLayout());
         rootPanel.setBackground(AppTheme.BACKGROUND);
@@ -36,6 +41,7 @@ public class DashboardUser extends AppFrame {
         JButton btnLihatBarang = AppButtonFactory.primary("LIHAT BARANG");
         JButton btnTambahBarang = AppButtonFactory.success("TAMBAH BARANG");
         JButton btnLogout = AppButtonFactory.danger("LOGOUT");
+        JButton btnBack = hasParentFrame() ? AppButtonFactory.warning("BACK") : null;
 
         Dimension buttonSize = new Dimension(220, 40);
         btnLihatBarang.setMaximumSize(buttonSize);
@@ -44,6 +50,10 @@ public class DashboardUser extends AppFrame {
         btnLihatBarang.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnTambahBarang.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnLogout.setAlignmentX(Component.CENTER_ALIGNMENT);
+        if (btnBack != null) {
+            btnBack.setMaximumSize(buttonSize);
+            btnBack.setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
 
         contentPanel.add(header);
         contentPanel.add(Box.createVerticalStrut(28));
@@ -51,6 +61,10 @@ public class DashboardUser extends AppFrame {
         contentPanel.add(Box.createVerticalStrut(14));
         contentPanel.add(btnTambahBarang);
         contentPanel.add(Box.createVerticalStrut(14));
+        if (btnBack != null) {
+            contentPanel.add(btnBack);
+            contentPanel.add(Box.createVerticalStrut(14));
+        }
         contentPanel.add(btnLogout);
 
         card.setContent(contentPanel);
@@ -58,11 +72,16 @@ public class DashboardUser extends AppFrame {
 
         add(rootPanel);
 
-        btnLihatBarang.addActionListener(e -> new LihatBarang().setVisible(true));
+        btnLihatBarang.addActionListener(e -> showChildFrame(new LihatBarang(this)));
 
-        btnTambahBarang.addActionListener(e -> new InputBarang().setVisible(true));
+        btnTambahBarang.addActionListener(e -> showChildFrame(new InputBarang(this)));
+
+        if (btnBack != null) {
+            btnBack.addActionListener(e -> backToParent());
+        }
 
         btnLogout.addActionListener(e -> {
+            UserSession.clear();
             dispose();
             new Login().setVisible(true);
         });

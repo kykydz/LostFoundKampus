@@ -5,6 +5,7 @@
 package View.Admin;
 
 import View.Component.AppContentPanel;
+import View.Component.AppButtonFactory;
 import View.Component.AppFrame;
 import View.Component.AppLabelFactory;
 import View.Component.AppTheme;
@@ -13,13 +14,22 @@ import java.awt.BorderLayout;
 
 public class EditBarang extends AppFrame {
     public EditBarang() {
-        super("Edit Barang", AppTheme.WINDOW_COMPACT);
+        this(null);
+    }
+
+    public EditBarang(JFrame parentFrame) {
+        super("Edit Barang", AppTheme.WINDOW_COMPACT, parentFrame);
 
         JPanel panel = createScreenPanel();
         JPanel content = new AppContentPanel(new BorderLayout());
         JLabel label = AppLabelFactory.sectionTitle("FORM EDIT BARANG");
+        JButton btnBack = hasParentFrame() ? AppButtonFactory.danger("BACK") : null;
 
         content.add(label, BorderLayout.CENTER);
+        if (btnBack != null) {
+            content.add(btnBack, BorderLayout.SOUTH);
+            btnBack.addActionListener(e -> backToParent());
+        }
         panel.add(content, BorderLayout.CENTER);
         setScreenContent(panel);
     }

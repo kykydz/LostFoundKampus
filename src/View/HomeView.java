@@ -76,14 +76,12 @@ public class HomeView extends AppFrame implements HomeViewContract {
 
     @Override
     public void openLogin() {
-        dispose();
-        new Login().setVisible(true);
+        showChildFrame(new Login(this));
     }
 
     @Override
     public void openRegister() {
-        dispose();
-        new Register().setVisible(true);
+        showChildFrame(new Register(this));
     }
 
     @Override

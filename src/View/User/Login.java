@@ -6,6 +6,7 @@ package View.User;
 
 import Controller.ControllerLogin;
 import Controller.LoginViewContract;
+import View.HomeView;
 import View.Admin.DashboardAdmin;
 import View.Component.AppButtonFactory;
 import View.Component.AppContentPanel;
@@ -22,7 +23,11 @@ public class Login extends AppFrame implements LoginViewContract {
     private final LabeledInput passwordInput;
 
     public Login() {
-        super("Login", AppTheme.WINDOW_AUTH);
+        this(null);
+    }
+
+    public Login(JFrame parentFrame) {
+        super("Login", AppTheme.WINDOW_AUTH, parentFrame);
 
         ControllerLogin controller = new ControllerLogin(this);
 
@@ -45,13 +50,19 @@ public class Login extends AppFrame implements LoginViewContract {
         usernameInput = LabeledInput.text("Username", 16);
         passwordInput = LabeledInput.password("Password", 16);
 
+        JButton btnHome = AppButtonFactory.warning("HOME");
         JButton btnLogin = AppButtonFactory.primary("LOGIN");
         JButton btnRegister = AppButtonFactory.success("REGISTER");
+        JButton btnCancel = hasParentFrame() ? AppButtonFactory.danger("CANCEL") : null;
 
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 12, 0));
+        JPanel buttonPanel = new JPanel(new GridLayout(1, hasParentFrame() ? 4 : 3, 12, 0));
         buttonPanel.setOpaque(false);
+        buttonPanel.add(btnHome);
         buttonPanel.add(btnLogin);
         buttonPanel.add(btnRegister);
+        if (btnCancel != null) {
+            buttonPanel.add(btnCancel);
+        }
 
         gbc.gridy = 0;
         form.add(title, gbc);
@@ -69,17 +80,20 @@ public class Login extends AppFrame implements LoginViewContract {
         panel.add(form, BorderLayout.CENTER);
         setScreenContent(panel);
 
-        btnLogin.addActionListener(e ->
+        btnLogin.addActionListener(_ ->
             controller.handleLogin(
                 usernameInput.getText(),
                 passwordInput.getPassword()
             )
         );
 
-        btnRegister.addActionListener(e -> {
-            dispose();
-            new Register().setVisible(true);
-        });
+        btnHome.addActionListener(_ -> openHome());
+
+        btnRegister.addActionListener(_ -> showChildFrame(new Register(this)));
+
+        if (btnCancel != null) {
+            btnCancel.addActionListener(_ -> backToParent());
+        }
     }
 
     @Override
@@ -94,13 +108,29 @@ public class Login extends AppFrame implements LoginViewContract {
 
     @Override
     public void openAdminDashboard() {
+        if (hasParentFrame()) {
+            getParentFrame().dispose();
+        }
         dispose();
         new DashboardAdmin().setVisible(true);
     }
 
     @Override
     public void openUserDashboard() {
+        if (hasParentFrame()) {
+            getParentFrame().dispose();
+        }
         dispose();
         new DashboardUser().setVisible(true);
+    }
+
+    private void openHome() {
+        if (hasParentFrame()) {
+            backToParent();
+            return;
+        }
+
+        dispose();
+        new HomeView().setVisible(true);
     }
 }

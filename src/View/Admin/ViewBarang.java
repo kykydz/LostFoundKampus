@@ -28,8 +28,6 @@ public class ViewBarang extends AppFrame {
 
     private final JTextField txtSearch;
     
-    private ControllerBarang controller;
-
     public ViewBarang() {
         this(null);
     }
@@ -68,13 +66,9 @@ public class ViewBarang extends AppFrame {
         tableBarang = new JTable();
         AppTableFactory.style(tableBarang);
 
-        header.setBackground(Color.WHITE);
+        JScrollPane scroll = new JScrollPane(tableBarang);
 
-        header.setBorder(
-                BorderFactory.createEmptyBorder(
-                        20,25,20,25
-                )
-        );
+        scroll.setBounds(50,120,680,280);
 
         panel.add(title);
         panel.add(txtSearch);
@@ -89,52 +83,7 @@ public class ViewBarang extends AppFrame {
         
         add(panel);
 
-        lblTitle.setFont(
-                new Font("SansSerif", Font.BOLD, 24)
-        );
-
-        header.add(lblTitle, BorderLayout.WEST);
-
-        btnBack = new JButton("← Dashboard");
-
-        btnBack.addActionListener(e -> {
-
-            new DashboardAdmin().setVisible(true);
-
-            dispose();
-        });
-
-        header.add(btnBack, BorderLayout.EAST);
-
-        mainPanel.add(header, BorderLayout.NORTH);
-
-        // CONTENT
-        JPanel content = new JPanel();
-
-        content.setBackground(
-                new Color(241,245,249)
-        );
-
-        content.setBorder(
-                BorderFactory.createEmptyBorder(
-                        25,25,25,25
-                )
-        );
-
-        content.setLayout(new BorderLayout());
-
-        // TOP PANEL
-        JPanel topPanel = new JPanel(
-                new BorderLayout(15,0)
-        );
-
-        topPanel.setOpaque(false);
-
-        tfSearch = new JTextField();
-
-        tfSearch.setPreferredSize(
-                new Dimension(300,40)
-        );
+        loadTable();
 
         btnSearch.addActionListener(event -> searchData());
 
@@ -149,7 +98,8 @@ public class ViewBarang extends AppFrame {
             btnBack.addActionListener(event -> backToParent());
         }
 
-        topPanel.add(buttonPanel, BorderLayout.EAST);
+        txtSearch.addKeyListener(
+                new java.awt.event.KeyAdapter() {
 
                     @Override
                     public void keyReleased(java.awt.event.KeyEvent ignored){
@@ -158,37 +108,18 @@ public class ViewBarang extends AppFrame {
                 }
         );
     }
+    
     private void loadTable(){
-
-        List<ModelBarang> list =
-                controller.getAll();
-
-        ModelTableBarang model =
-                new ModelTableBarang(list);
-
+        ControllerBarang controller = new ControllerBarang();
+        List<ModelBarang> list = controller.getAll();
+        ModelTableBarang model = new ModelTableBarang(list);
         tableBarang.setModel(model);
-
-        tableBarang.setRowHeight(32);
-
-        tableBarang.getTableHeader().setBackground(
-                new Color(37,99,235)
-        );
-
-        tableBarang.getTableHeader().setForeground(
-                Color.WHITE
-        );
     }
     
-    private void searchBarang(){
-
-        List<ModelBarang> list =
-                controller.search(
-                        tfSearch.getText()
-                );
-
-        ModelTableBarang model =
-                new ModelTableBarang(list);
-
+    private void searchData() {
+        ControllerBarang controller = new ControllerBarang();
+        List<ModelBarang> list = controller.search(txtSearch.getText());
+        ModelTableBarang model = new ModelTableBarang(list);
         tableBarang.setModel(model);
     }
     

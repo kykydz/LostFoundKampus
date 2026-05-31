@@ -18,10 +18,6 @@ import javax.swing.*;
  * @author Ivaa
  */
 
-import View.Components.Sidebar;
-import View.Components.CustomButton;
-import Controller.ControllerBarang;
-import Model.Barang.ModelBarang;
 
 public class InputBarang extends AppFrame {
 
@@ -44,7 +40,7 @@ public class InputBarang extends AppFrame {
     public InputBarang(JFrame parentFrame) {
         super("Input Barang", AppTheme.WINDOW_FORM, parentFrame);
 
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        JPanel panel = new JPanel();
 
         panel.setLayout(null);
         panel.setBackground(AppTheme.BACKGROUND);
@@ -59,17 +55,16 @@ public class InputBarang extends AppFrame {
         lblNama.setFont(AppTheme.LABEL_FONT);
         lblNama.setForeground(AppTheme.TEXT_PRIMARY);
 
-        // HEADER
-        JPanel header = new JPanel(
-                new BorderLayout()
-        );
+        lblNama.setBounds(50,80,120,25);
 
-        header.setBackground(Color.WHITE);
+        txtNamaBarang =
+                new JTextField();
 
-        header.setBorder(
-                BorderFactory.createEmptyBorder(
-                        20,25,20,25
-                )
+        txtNamaBarang.setBounds(
+                180,
+                80,
+                220,
+                25
         );
 
         JLabel lblKategori =
@@ -108,31 +103,49 @@ public class InputBarang extends AppFrame {
         lblDeskripsi.setFont(AppTheme.LABEL_FONT);
         lblDeskripsi.setForeground(AppTheme.TEXT_PRIMARY);
 
-        btnBack = new JButton("← Kembali");
+        lblDeskripsi.setBounds(
+                50,
+                160,
+                120,
+                25
+        );
 
         txtDeskripsi =
                 new JTextArea();
         txtDeskripsi.setFont(AppTheme.BODY_FONT);
 
-            new ViewBarang().setVisible(true);
+        JScrollPane sp =
+                new JScrollPane(
+                        txtDeskripsi
+                );
 
-            dispose();
-        });
+        sp.setBounds(
+                180,
+                160,
+                220,
+                80
+        );
 
         JLabel lblLokasi =
                 new JLabel("Lokasi");
         lblLokasi.setFont(AppTheme.LABEL_FONT);
         lblLokasi.setForeground(AppTheme.TEXT_PRIMARY);
 
-        mainPanel.add(header, BorderLayout.NORTH);
-
-        // CONTENT
-        JPanel content = new JPanel(
-                new GridBagLayout()
+        lblLokasi.setBounds(
+                50,
+                260,
+                120,
+                25
         );
 
-        content.setBackground(
-                new Color(241,245,249)
+        txtLokasi =
+                new JTextField();
+
+        txtLokasi.setBounds(
+                180,
+                260,
+                220,
+                25
         );
 
         JLabel lblStatus =
@@ -140,8 +153,11 @@ public class InputBarang extends AppFrame {
         lblStatus.setFont(AppTheme.LABEL_FONT);
         lblStatus.setForeground(AppTheme.TEXT_PRIMARY);
 
-        formCard.setPreferredSize(
-                new Dimension(500,450)
+        lblStatus.setBounds(
+                50,
+                300,
+                120,
+                25
         );
 
         cbStatus =
@@ -164,8 +180,12 @@ public class InputBarang extends AppFrame {
         lblClaim.setFont(AppTheme.LABEL_FONT);
         lblClaim.setForeground(AppTheme.TEXT_PRIMARY);
 
-        // NAMA
-        formCard.add(new JLabel("Nama Barang"));
+        lblClaim.setBounds(
+                50,
+                340,
+                120,
+                25
+        );
 
         cbStatusClaim =
                 new JComboBox<>(
@@ -213,24 +233,31 @@ public class InputBarang extends AppFrame {
         cbStatus.setFont(AppTheme.BODY_FONT);
         cbStatusClaim.setFont(AppTheme.BODY_FONT);
 
-        formCard.add(tfNama);
+        panel.add(title);
 
-        formCard.add(Box.createVerticalStrut(18));
+        panel.add(lblNama);
+        panel.add(txtNamaBarang);
 
-        // KATEGORI
-        formCard.add(new JLabel("Kategori"));
+        panel.add(lblKategori);
+        panel.add(cbKategori);
 
-        formCard.add(Box.createVerticalStrut(8));
+        panel.add(lblDeskripsi);
+        panel.add(sp);
 
-            cbKategori = new JComboBox<>();
+        panel.add(lblLokasi);
+        panel.add(txtLokasi);
 
-            cbKategori.addItem("Elektronik");
+        panel.add(lblStatus);
+        panel.add(cbStatus);
 
-            cbKategori.addItem("Aksesoris");
+        panel.add(lblClaim);
+        panel.add(cbStatusClaim);
 
-            cbKategori.addItem("Dokumen");
+        panel.add(btnSimpan);
+        panel.add(btnReset);
+        panel.add(btnBack);
 
-            cbKategori.addItem("Pakaian");
+        add(panel);
 
         btnSimpan.addActionListener(event -> simpanData());
 
@@ -250,22 +277,26 @@ public class InputBarang extends AppFrame {
         });
     }
 
-        formCard.add(Box.createVerticalStrut(8));
+    private void simpanData() {
 
-        tfLokasi = new JTextField();
+        ModelBarang barang =
+                new ModelBarang();
 
-        tfLokasi.setMaximumSize(
-                new Dimension(Integer.MAX_VALUE,40)
+        barang.setNamaBarang(
+                txtNamaBarang.getText()
         );
 
         barang.setKategori(
                 String.valueOf(cbKategori.getSelectedItem())
         );
 
-        formCard.add(Box.createVerticalStrut(18));
+        barang.setDeskripsi(
+                txtDeskripsi.getText()
+        );
 
-        // STATUS
-        formCard.add(new JLabel("Status"));
+        barang.setLokasi(
+                txtLokasi.getText()
+        );
 
         barang.setStatus(
                 String.valueOf(cbStatus.getSelectedItem())
@@ -278,78 +309,32 @@ public class InputBarang extends AppFrame {
         int currentUserId = UserSession.getCurrentUserId();
         barang.setUserId(currentUserId == 0 ? 1 : currentUserId);
 
-        formCard.add(Box.createVerticalStrut(8));
+        ControllerBarang controller =
+                new ControllerBarang();
 
-        taDeskripsi = new JTextArea(5,20);
+        controller.insert(barang);
 
-        JScrollPane scrollPane =
-                new JScrollPane(taDeskripsi);
-
-        formCard.add(scrollPane);
-
-        formCard.add(Box.createVerticalStrut(25));
-
-        btnSimpan = new CustomButton(
-                "SIMPAN"
+        JOptionPane.showMessageDialog(
+                this,
+                "Data berhasil disimpan"
         );
 
-        formCard.add(btnSimpan);
-        btnSimpan.addActionListener(e -> simpanBarang());
-
-        content.add(formCard);
-
-        mainPanel.add(content, BorderLayout.CENTER);
-
-        setVisible(true);
+        resetForm();
     }
-    private void simpanBarang(){
 
-        try {
+    private void resetForm() {
 
-            ModelBarang barang =
-                    new ModelBarang();
+        txtNamaBarang.setText("");
 
-            barang.setNamaBarang(
-                    tfNama.getText()
-            );
-            barang.setKategori(
-                    cbKategori
-                .getSelectedItem()
-                .toString()
-            );
-            barang.setLokasi(
-                    tfLokasi.getText()
-            );
+        txtDeskripsi.setText("");
 
-            barang.setDeskripsi(
-                    taDeskripsi.getText()
-            );
+        txtLokasi.setText("");
 
-            barang.setStatus(
-                    cbStatus.getSelectedItem().toString()
-            );
+        cbKategori.setSelectedIndex(0);
 
-            barang.setStatusClaim("None");
+        cbStatus.setSelectedIndex(0);
 
-            barang.setUserId(1);
-
-            controller.insert(barang);
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Barang berhasil disimpan!"
-            );
-
-            new ViewBarang().setVisible(true);
-
-            dispose();
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage()
-            );
-        }
+        cbStatusClaim.setSelectedIndex(0);
     }
 }
+

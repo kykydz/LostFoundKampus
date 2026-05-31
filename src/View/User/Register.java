@@ -90,17 +90,22 @@ public class Register extends AppFrame {
         }
     }
 
-        card.add(tfNama);
+    private void register(){
 
         if(namaInput.getText().isEmpty()
                 || usernameInput.getText().isEmpty()
                 || passwordInput.getPassword().length == 0){
 
-        card.add(new JLabel("Username"));
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Data tidak boleh kosong"
+            );
 
-        card.add(Box.createVerticalStrut(8));
+            return;
+        }
 
-        tfUsername = new JTextField();
+        ModelUser user =
+                new ModelUser();
 
         user.setNama(
                 namaInput.getText()
@@ -114,22 +119,14 @@ public class Register extends AppFrame {
                 new String(passwordInput.getPassword())
         );
 
-        card.add(pfConfirm);
+        ControllerUser controller =
+                new ControllerUser();
 
-        card.add(Box.createVerticalStrut(28));
+        controller.insert(user);
 
-        btnRegister = new CustomButton(
-                "REGISTER"
-        );
-
-        btnRegister.addActionListener(e -> register());
-
-        card.add(btnRegister);
-
-        card.add(Box.createVerticalStrut(15));
-
-        btnBack = new JButton(
-                "← Kembali ke Login"
+        JOptionPane.showMessageDialog(
+                this,
+                "Register berhasil"
         );
 
         openLoginScreen();
@@ -147,43 +144,6 @@ public class Register extends AppFrame {
             return;
         }
 
-        rightPanel.add(card);
-
-        add(rightPanel);
-
-        setVisible(true);
-    }
-
-    private void register() {
-
-        try {
-
-            controller.register(
-                    tfNama.getText(),
-                    tfUsername.getText(),
-                    String.valueOf(
-                            pfPassword.getPassword()
-                    ),
-                    String.valueOf(
-                            pfConfirm.getPassword()
-                    )
-            );
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Register berhasil!"
-            );
-
-            new Login().setVisible(true);
-
-            dispose();
-
-        } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(
-                    this,
-                    e.getMessage()
-            );
-        }
+        new Login().setVisible(true);
     }
 }

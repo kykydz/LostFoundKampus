@@ -8,10 +8,10 @@ package View.User;
  *
  * @author Ivaa
  */
-
 import Controller.ControllerBarang;
 import Model.Barang.ModelBarang;
 import Model.Barang.ModelTableBarang;
+import Model.User.ModelUser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,14 +25,24 @@ public class LihatBarang extends JFrame {
 
     JButton btnSearch;
     JButton btnRefresh;
+    JButton btnClaim;
 
-    public LihatBarang(){
+    private ModelUser user;
+
+    public LihatBarang(ModelUser user){
+
+        this.user = user;
 
         setTitle("Lihat Barang");
-        setSize(800,500);
+
+        setSize(900,550);
+
         setLocationRelativeTo(null);
 
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
         JPanel panel = new JPanel();
+
         panel.setLayout(null);
 
         JLabel title =
@@ -42,11 +52,11 @@ public class LihatBarang extends JFrame {
                 new Font(
                         "Segoe UI",
                         Font.BOLD,
-                        20
+                        22
                 )
         );
 
-        title.setBounds(280,20,250,30);
+        title.setBounds(320,20,300,30);
 
         txtSearch = new JTextField();
 
@@ -54,7 +64,7 @@ public class LihatBarang extends JFrame {
                 50,
                 70,
                 250,
-                30
+                35
         );
 
         btnSearch =
@@ -64,7 +74,7 @@ public class LihatBarang extends JFrame {
                 320,
                 70,
                 100,
-                30
+                35
         );
 
         btnRefresh =
@@ -74,7 +84,18 @@ public class LihatBarang extends JFrame {
                 440,
                 70,
                 100,
-                30
+                35
+        );
+
+        // BUTTON CLAIM
+        btnClaim =
+                new JButton("Klaim Barang");
+
+        btnClaim.setBounds(
+                650,
+                70,
+                170,
+                35
         );
 
         tableBarang = new JTable();
@@ -87,24 +108,32 @@ public class LihatBarang extends JFrame {
         scroll.setBounds(
                 50,
                 130,
-                680,
-                280
+                780,
+                320
         );
 
         panel.add(title);
+
         panel.add(txtSearch);
+
         panel.add(btnSearch);
+
         panel.add(btnRefresh);
+
+        panel.add(btnClaim);
+
         panel.add(scroll);
 
         add(panel);
 
         loadTable();
 
+        // SEARCH
         btnSearch.addActionListener(
                 e -> searchData()
         );
 
+        // REFRESH
         btnRefresh.addActionListener(
                 e -> {
 
@@ -114,6 +143,7 @@ public class LihatBarang extends JFrame {
                 }
         );
 
+        // LIVE SEARCH
         txtSearch.addKeyListener(
                 new java.awt.event.KeyAdapter() {
 
@@ -125,6 +155,9 @@ public class LihatBarang extends JFrame {
                     }
                 }
         );
+
+        // CLAIM BUTTON
+        btnClaim.addActionListener(e -> claimBarang());
     }
 
     private void loadTable(){
@@ -139,8 +172,16 @@ public class LihatBarang extends JFrame {
                 new ModelTableBarang(list);
 
         tableBarang.setModel(model);
-        tableBarang.getTableHeader().setBackground(new Color(52,152,219));
-        tableBarang.getTableHeader().setForeground(Color.WHITE);
+
+        tableBarang.setRowHeight(30);
+
+        tableBarang.getTableHeader().setBackground(
+                new Color(52,152,219)
+        );
+
+        tableBarang.getTableHeader().setForeground(
+                Color.WHITE
+        );
     }
 
     private void searchData(){
@@ -157,5 +198,37 @@ public class LihatBarang extends JFrame {
                 new ModelTableBarang(list);
 
         tableBarang.setModel(model);
+    }
+
+    private void claimBarang(){
+
+        int selectedRow =
+                tableBarang.getSelectedRow();
+
+        if(selectedRow == -1){
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Pilih barang terlebih dahulu!"
+            );
+
+            return;
+        }
+
+        // AMBIL ID BARANG DARI KOLOM 0
+        int idBarang =
+                Integer.parseInt(
+                        tableBarang.getValueAt(
+                                selectedRow,
+                                0
+                        ).toString()
+                );
+
+        // OPEN MODAL CLAIM
+        new ModalClaimBarang(
+                this,
+                idBarang,
+                user.getId()
+        );
     }
 }

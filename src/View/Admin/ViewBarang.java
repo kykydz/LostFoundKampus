@@ -4,122 +4,271 @@
  */
 package View.Admin;
 
-import Controller.ControllerBarang;
-import Model.Barang.ModelBarang;
-import Model.Barang.ModelTableBarang;
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
 /**
  *
  * @author Ivaa
  */
+import Model.Barang.ModelTableBarang;
+import View.Components.Sidebar;
+import View.Components.CustomButton;
+
+import javax.swing.*;
+import java.awt.*;
+import Controller.ControllerBarang;
+import Model.Barang.ModelBarang;
+import java.util.List;
+
 public class ViewBarang extends JFrame {
-    JTable tableBarang;
 
-    JTextField txtSearch;
+    private JTable tableBarang;
 
-    JButton btnSearch;
-    JButton btnRefresh;
-    JButton btnDelete;
+    private JTextField tfSearch;
+
+    private CustomButton btnTambah;
+
+    private JButton btnEdit;
+
+    private JButton btnHapus;
+
+    private JButton btnRefresh;
+
+    private JButton btnBack;
     
+    private ControllerBarang controller;
+
     public ViewBarang() {
-        setTitle("View Barang");
-        setSize(800,500);
+
+        controller = new ControllerBarang();
+
+        initComponents();
+
+        loadTable();
+    }
+
+    private void initComponents() {
+
+        setTitle("Data Barang");
+
+        setSize(1200,700);
+
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        JLabel title = new JLabel("DATA BARANG");
-        title.setFont(new Font("Segoe UI",Font.BOLD,20));
-        title.setBounds(300,20,250,30);
+        setLayout(new BorderLayout());
 
-        txtSearch = new JTextField();
-        txtSearch.setBounds(50,70,250,30);
+        // SIDEBAR
+        add(new Sidebar(this), BorderLayout.WEST);
 
-        btnSearch = new JButton("SEARCH");
-        btnSearch.setBounds(320,70,100,30);
+        // MAIN PANEL
+        JPanel mainPanel = new JPanel(
+                new BorderLayout()
+        );
 
-        btnRefresh = new JButton("REFRESH");
-        btnRefresh.setBounds(440,70,100,30);
+        mainPanel.setBackground(
+                new Color(241,245,249)
+        );
 
-        btnDelete = new JButton("DELETE");
-        btnDelete.setBounds(560,70,100,30);
+        add(mainPanel, BorderLayout.CENTER);
 
-        tableBarang = new JTable();
-        tableBarang.getTableHeader().setBackground(new Color(52,152,219));
-        tableBarang.setRowHeight(25);
-        tableBarang.getTableHeader().setForeground(Color.WHITE);
+        // HEADER
+        JPanel header = new JPanel(
+                new BorderLayout()
+        );
 
-        JScrollPane scroll = new JScrollPane(tableBarang);
+        header.setBackground(Color.WHITE);
 
-        scroll.setBounds(50,120,680,280);
+        header.setBorder(
+                BorderFactory.createEmptyBorder(
+                        20,25,20,25
+                )
+        );
 
-        panel.add(title);
-        panel.add(txtSearch);
-        panel.add(btnSearch);
-        panel.add(btnRefresh);
-        panel.add(btnDelete);
-        panel.add(scroll);
+        JLabel lblTitle = new JLabel(
+                "Data Barang"
+        );
+
+        lblTitle.setFont(
+                new Font("SansSerif", Font.BOLD, 24)
+        );
+
+        header.add(lblTitle, BorderLayout.WEST);
+
+        btnBack = new JButton("← Dashboard");
+
+        btnBack.addActionListener(e -> {
+
+            new DashboardAdmin().setVisible(true);
+
+            dispose();
+        });
+
+        header.add(btnBack, BorderLayout.EAST);
+
+        mainPanel.add(header, BorderLayout.NORTH);
+
+        // CONTENT
+        JPanel content = new JPanel();
+
+        content.setBackground(
+                new Color(241,245,249)
+        );
+
+        content.setBorder(
+                BorderFactory.createEmptyBorder(
+                        25,25,25,25
+                )
+        );
+
+        content.setLayout(new BorderLayout());
+
+        // TOP PANEL
+        JPanel topPanel = new JPanel(
+                new BorderLayout(15,0)
+        );
+
+        topPanel.setOpaque(false);
+
+        tfSearch = new JTextField();
+
+        tfSearch.setPreferredSize(
+                new Dimension(300,40)
+        );
+
+        topPanel.add(tfSearch, BorderLayout.WEST);
+        tfSearch.addKeyListener(
+        new java.awt.event.KeyAdapter() {
+
+            public void keyReleased(
+                    java.awt.event.KeyEvent evt
+            ){
+
+                searchBarang();
+            }
+        }
+);
+
+        JPanel buttonPanel = new JPanel(
+                new FlowLayout(
+                        FlowLayout.RIGHT
+                )
+        );
+
+        buttonPanel.setOpaque(false);
+
+        btnTambah = new CustomButton(
+                "Tambah Barang"
+        );
+
+        btnTambah.addActionListener(e -> {
+
+            new InputBarang().setVisible(true);
+
+            dispose();
+        });
+
+        buttonPanel.add(btnTambah);
+
+        btnRefresh = new JButton("Refresh");
+
+        buttonPanel.add(btnRefresh);
         
-        add(panel);
-
-        loadTable();
-
-        btnSearch.addActionListener(e -> searchData());
-
         btnRefresh.addActionListener(e -> {
-            txtSearch.setText("");
+
             loadTable();
         });
-        
-        btnDelete.addActionListener(e -> deleteData());
 
-        txtSearch.addKeyListener(
-                new java.awt.event.KeyAdapter() {
+        topPanel.add(buttonPanel, BorderLayout.EAST);
 
-                    public void keyReleased(java.awt.event.KeyEvent evt){
-                        searchData();
-                    }
-                }
+        content.add(topPanel, BorderLayout.NORTH);
+
+        // TABLE PANEL
+        JPanel tablePanel = new JPanel(
+                new BorderLayout()
         );
-        txtSearch.setBorder(
-        BorderFactory.createLineBorder(
-        new Color(52,152,219),
-        2
-            )
+
+        tablePanel.setBackground(Color.WHITE);
+
+        tablePanel.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(
+                                new Color(220,220,220)
+                        ),
+                        BorderFactory.createEmptyBorder(
+                                20,20,20,20
+                        )
+                )
         );
+
+        tableBarang = new JTable();
+
+        String[][] data = {};
+
+        tableBarang = new JTable(data, columns);
+
+        tableBarang.setRowHeight(32);
+
+        JScrollPane scrollPane =
+                new JScrollPane(tableBarang);
+
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+
+        // ACTION PANEL
+        JPanel actionPanel = new JPanel(
+                new FlowLayout(
+                        FlowLayout.RIGHT
+                )
+        );
+
+        actionPanel.setBackground(Color.WHITE);
+
+        btnEdit = new JButton("Edit");
+
+        btnHapus = new JButton("Hapus");
+
+        actionPanel.add(btnEdit);
+
+        actionPanel.add(btnHapus);
+
+        tablePanel.add(actionPanel, BorderLayout.SOUTH);
+
+        content.add(tablePanel, BorderLayout.CENTER);
+
+        mainPanel.add(content, BorderLayout.CENTER);
+
+        setVisible(true);
     }
-    
     private void loadTable(){
-        ControllerBarang controller = new ControllerBarang();
-        List<ModelBarang> list = controller.getAll();
-        ModelTableBarang model = new ModelTableBarang(list);
+
+        List<ModelBarang> list =
+                controller.getAll();
+
+        ModelTableBarang model =
+                new ModelTableBarang(list);
+
         tableBarang.setModel(model);
+
+        tableBarang.setRowHeight(32);
+
+        tableBarang.getTableHeader().setBackground(
+                new Color(37,99,235)
+        );
+
+        tableBarang.getTableHeader().setForeground(
+                Color.WHITE
+        );
     }
     
-    private void searchData() {
-        ControllerBarang controller = new ControllerBarang();
-        List<ModelBarang> list = controller.search(txtSearch.getText());
-        ModelTableBarang model = new ModelTableBarang(list);
+    private void searchBarang(){
+
+        List<ModelBarang> list =
+                controller.search(
+                        tfSearch.getText()
+                );
+
+        ModelTableBarang model =
+                new ModelTableBarang(list);
+
         tableBarang.setModel(model);
-    }
-    
-    private void deleteData(){
-        int row = tableBarang.getSelectedRow();
-        
-        if(row == -1) {
-            JOptionPane.showMessageDialog(this, "Pilih data dulu!");
-            return;
-        }
-        
-        int id = Integer.parseInt(tableBarang.getValueAt(row, 0).toString());
-        
-        ControllerBarang controller = new ControllerBarang();
-        controller.delete(id);
-        JOptionPane.showMessageDialog(this, "Data berhasil dihapus");
-        
-        loadTable();
     }
 }

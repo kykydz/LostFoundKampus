@@ -4,355 +4,288 @@
  */
 package View.Admin;
 
-import Controller.ControllerBarang;
-import Model.Barang.ModelBarang;
-import javax.swing.*;
-import java.awt.*;
 
 /**
  *
  * @author Ivaa
  */
 
+import View.Components.Sidebar;
+import View.Components.CustomButton;
+import Controller.ControllerBarang;
+import Model.Barang.ModelBarang;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class InputBarang extends JFrame {
 
-    JTextField txtNamaBarang;
+    private JTextField tfNama;
 
-    JComboBox cbKategori;
+    private JComboBox<String> cbKategori;
 
-    JTextArea txtDeskripsi;
+    private JTextField tfLokasi;
 
-    JTextField txtLokasi;
+    private JTextArea taDeskripsi;
 
-    JComboBox cbStatus;
+    private JComboBox<String> cbStatus;
 
-    JComboBox cbStatusClaim;
+    private CustomButton btnSimpan;
 
-    JButton btnSimpan;
-
-    JButton btnReset;
-
-    JButton btnBack;
+    private JButton btnBack;
     
-    
+    private ControllerBarang controller;
 
     public InputBarang() {
+        controller = new ControllerBarang();
+        initComponents();
+    }
+
+    private void initComponents() {
 
         setTitle("Input Barang");
 
-        setSize(500,550);
+        setSize(1200,700);
 
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        panel.setLayout(null);
-        panel.setBackground(new Color(245,245,245));
-        
+        setLayout(new BorderLayout());
 
-        JLabel title =
-                new JLabel("INPUT BARANG");
+        add(new Sidebar(this), BorderLayout.WEST);
 
-        title.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        20
+        JPanel mainPanel = new JPanel(
+                new BorderLayout()
+        );
+
+        mainPanel.setBackground(
+                new Color(241,245,249)
+        );
+
+        add(mainPanel, BorderLayout.CENTER);
+
+        // HEADER
+        JPanel header = new JPanel(
+                new BorderLayout()
+        );
+
+        header.setBackground(Color.WHITE);
+
+        header.setBorder(
+                BorderFactory.createEmptyBorder(
+                        20,25,20,25
                 )
         );
 
-        title.setBounds(150,20,250,30);
-        title.setForeground(new Color(41,128,185));
-
-        JLabel lblNama =
-                new JLabel("Nama Barang");
-
-        lblNama.setBounds(50,80,120,25);
-
-        txtNamaBarang =
-                new JTextField();
-
-        txtNamaBarang.setBounds(
-                180,
-                80,
-                220,
-                25
+        JLabel lblTitle = new JLabel(
+                "Input Barang"
         );
 
-        JLabel lblKategori =
-                new JLabel("Kategori");
-
-        lblKategori.setBounds(
-                50,
-                120,
-                120,
-                25
+        lblTitle.setFont(
+                new Font("SansSerif", Font.BOLD, 24)
         );
 
-        cbKategori =
-                new JComboBox(
-                        new String[]{
-                                "Elektronik",
-                                "Dokumen",
-                                "Aksesoris",
-                                "Pakaian",
-                                "Kendaraan",
-                                "Peralatan Kuliah"
-                        }
-                );
+        header.add(lblTitle, BorderLayout.WEST);
 
-        cbKategori.setBounds(
-                180,
-                120,
-                220,
-                25
+        btnBack = new JButton("← Kembali");
+
+        btnBack.addActionListener(e -> {
+
+            new ViewBarang().setVisible(true);
+
+            dispose();
+        });
+
+        header.add(btnBack, BorderLayout.EAST);
+
+        mainPanel.add(header, BorderLayout.NORTH);
+
+        // CONTENT
+        JPanel content = new JPanel(
+                new GridBagLayout()
         );
 
-        JLabel lblDeskripsi =
-                new JLabel("Deskripsi");
-
-        lblDeskripsi.setBounds(
-                50,
-                160,
-                120,
-                25
+        content.setBackground(
+                new Color(241,245,249)
         );
 
-        txtDeskripsi =
-                new JTextArea();
+        JPanel formCard = new JPanel();
 
-        JScrollPane sp =
-                new JScrollPane(
-                        txtDeskripsi
-                );
-
-        sp.setBounds(
-                180,
-                160,
-                220,
-                80
+        formCard.setPreferredSize(
+                new Dimension(500,450)
         );
 
-        JLabel lblLokasi =
-                new JLabel("Lokasi");
+        formCard.setBackground(Color.WHITE);
 
-        lblLokasi.setBounds(
-                50,
-                260,
-                120,
-                25
+        formCard.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(
+                                new Color(220,220,220)
+                        ),
+                        BorderFactory.createEmptyBorder(
+                                25,25,25,25
+                        )
+                )
         );
 
-        txtLokasi =
-                new JTextField();
+        formCard.setLayout(new BoxLayout(
+                formCard,
+                BoxLayout.Y_AXIS
+        ));
 
-        txtLokasi.setBounds(
-                180,
-                260,
-                220,
-                25
+        // NAMA
+        formCard.add(new JLabel("Nama Barang"));
+
+        formCard.add(Box.createVerticalStrut(8));
+
+        tfNama = new JTextField();
+
+        tfNama.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE,40)
         );
 
-        JLabel lblStatus =
-                new JLabel("Status");
+        formCard.add(tfNama);
 
-        lblStatus.setBounds(
-                50,
-                300,
-                120,
-                25
+        formCard.add(Box.createVerticalStrut(18));
+
+        // KATEGORI
+        formCard.add(new JLabel("Kategori"));
+
+        formCard.add(Box.createVerticalStrut(8));
+
+            cbKategori = new JComboBox<>();
+
+            cbKategori.addItem("Elektronik");
+
+            cbKategori.addItem("Aksesoris");
+
+            cbKategori.addItem("Dokumen");
+
+            cbKategori.addItem("Pakaian");
+
+            cbKategori.addItem("Lainnya");
+
+            cbKategori.setMaximumSize(
+                    new Dimension(
+                            Integer.MAX_VALUE,
+                            40
+                    )
+            );
+
+            formCard.add(cbKategori);
+
+        formCard.add(Box.createVerticalStrut(18));
+
+        // LOKASI
+        formCard.add(new JLabel("Lokasi"));
+
+        formCard.add(Box.createVerticalStrut(8));
+
+        tfLokasi = new JTextField();
+
+        tfLokasi.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE,40)
         );
 
-        cbStatus =
-                new JComboBox(
-                        new String[]{
-                                "Hilang",
-                                "Ditemukan"
-                        }
-                );
+        formCard.add(tfLokasi);
 
-        cbStatus.setBounds(
-                180,
-                300,
-                220,
-                25
+        formCard.add(Box.createVerticalStrut(18));
+
+        // STATUS
+        formCard.add(new JLabel("Status"));
+
+        formCard.add(Box.createVerticalStrut(8));
+
+        cbStatus = new JComboBox<>();
+
+        cbStatus.addItem("Hilang");
+
+        cbStatus.addItem("Ditemukan");
+
+        cbStatus.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE,40)
         );
 
-        JLabel lblClaim =
-                new JLabel("Status Claim");
+        formCard.add(cbStatus);
 
-        lblClaim.setBounds(
-                50,
-                340,
-                120,
-                25
+        formCard.add(Box.createVerticalStrut(18));
+
+        // DESKRIPSI
+        formCard.add(new JLabel("Deskripsi"));
+
+        formCard.add(Box.createVerticalStrut(8));
+
+        taDeskripsi = new JTextArea(5,20);
+
+        JScrollPane scrollPane =
+                new JScrollPane(taDeskripsi);
+
+        formCard.add(scrollPane);
+
+        formCard.add(Box.createVerticalStrut(25));
+
+        btnSimpan = new CustomButton(
+                "SIMPAN"
         );
 
-        cbStatusClaim =
-                new JComboBox(
-                        new String[]{
-                                "Belum Diklaim",
-                                "Sudah Diklaim",
-                                "Sudah Ditemukan"
-                        }
-                );
+        formCard.add(btnSimpan);
+        btnSimpan.addActionListener(e -> simpanBarang());
 
-        cbStatusClaim.setBounds(
-                180,
-                340,
-                220,
-                25
-        );
+        content.add(formCard);
 
-        btnSimpan =
-                new JButton("SIMPAN");
+        mainPanel.add(content, BorderLayout.CENTER);
 
-        btnSimpan.setBounds(
-                50,
-                430,
-                120,
-                35
-        );
-        btnSimpan.setBackground(new Color(46,204,113));
-        btnSimpan.setForeground(Color.WHITE);
-        btnSimpan.setFocusPainted(false);
-
-        btnReset =
-                new JButton("RESET");
-
-        btnReset.setBounds(
-                190,
-                430,
-                120,
-                35
-        );
-        btnReset.setBackground(new Color(241,196,15));
-        btnReset.setForeground(Color.WHITE);
-        btnReset.setFocusPainted(false);
-
-        btnBack =
-                new JButton("BACK");
-
-        btnBack.setBounds(
-                330,
-                430,
-                120,
-                35
-        );
-        btnBack.setBackground(new Color(231,76,60));
-        btnBack.setForeground(Color.WHITE);
-        btnBack.setFocusPainted(false);
-
-        panel.add(title);
-
-        panel.add(lblNama);
-        panel.add(txtNamaBarang);
-
-        panel.add(lblKategori);
-        panel.add(cbKategori);
-
-        panel.add(lblDeskripsi);
-        panel.add(sp);
-
-        panel.add(lblLokasi);
-        panel.add(txtLokasi);
-
-        panel.add(lblStatus);
-        panel.add(cbStatus);
-
-        panel.add(lblClaim);
-        panel.add(cbStatusClaim);
-
-        panel.add(btnSimpan);
-        panel.add(btnReset);
-        panel.add(btnBack);
-
-        add(panel);
-
-        btnSimpan.addActionListener(
-                e -> simpanData()
-        );
-
-        btnReset.addActionListener(
-                e -> resetForm()
-        );
-
-        btnBack.addActionListener(
-                e -> {
-
-                    dispose();
-
-                    new DashboardAdmin()
-                            .setVisible(true);
-                }
-        );
+        setVisible(true);
     }
+    private void simpanBarang(){
 
-    private void simpanData() {
+        try {
 
-        ModelBarang barang =
-                new ModelBarang();
+            ModelBarang barang =
+                    new ModelBarang();
 
-        barang.setNamaBarang(
-                txtNamaBarang.getText()
-        );
+            barang.setNamaBarang(
+                    tfNama.getText()
+            );
+            barang.setKategori(
+                    cbKategori
+                .getSelectedItem()
+                .toString()
+            );
+            barang.setLokasi(
+                    tfLokasi.getText()
+            );
 
-        barang.setKategori(
-                cbKategori
-                        .getSelectedItem()
-                        .toString()
-        );
+            barang.setDeskripsi(
+                    taDeskripsi.getText()
+            );
 
-        barang.setDeskripsi(
-                txtDeskripsi.getText()
-        );
+            barang.setStatus(
+                    cbStatus.getSelectedItem().toString()
+            );
 
-        barang.setLokasi(
-                txtLokasi.getText()
-        );
+            barang.setStatusClaim("None");
 
-        barang.setStatus(
-                cbStatus
-                        .getSelectedItem()
-                        .toString()
-        );
+            barang.setUserId(1);
 
-        barang.setStatusClaim(
-                cbStatusClaim
-                        .getSelectedItem()
-                        .toString()
-        );
+            controller.insert(barang);
 
-        // sementara hardcode user
-        barang.setUserId(1);
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Barang berhasil disimpan!"
+            );
 
-        ControllerBarang controller =
-                new ControllerBarang();
+            new ViewBarang().setVisible(true);
 
-        controller.insert(barang);
+            dispose();
 
-        JOptionPane.showMessageDialog(
-                this,
-                "Data berhasil disimpan"
-        );
+        } catch (Exception e) {
 
-        resetForm();
-    }
-
-    private void resetForm() {
-
-        txtNamaBarang.setText("");
-
-        txtDeskripsi.setText("");
-
-        txtLokasi.setText("");
-
-        cbKategori.setSelectedIndex(0);
-
-        cbStatus.setSelectedIndex(0);
-
-        cbStatusClaim.setSelectedIndex(0);
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage()
+            );
+        }
     }
 }
-

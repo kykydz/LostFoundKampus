@@ -14,27 +14,25 @@ import Model.User.ModelUser;
 
 public class ControllerLogin {
 
-    DAOUser daoUser;
-
-    public static ModelUser userLogin;
+    private DAOUser daoUser;
 
     public ControllerLogin(){
 
-        daoUser =
-                new DAOUser();
+        daoUser = new DAOUser();
     }
 
     public ModelUser login(
             String username,
             String password
-    ){
+    ) {
 
-        userLogin =
-                daoUser.login(
-                        username,
-                        password
-                );
+        if(username.isEmpty() || password.isEmpty()){
 
-        return userLogin;
+            throw new IllegalArgumentException(
+                    "Semua field harus diisi!"
+            );
+        }
+
+        return daoUser.login(username,password);
     }
 }

@@ -10,149 +10,261 @@ package View.User;
  */
 
 import Controller.ControllerUser;
-import Model.User.ModelUser;
+import View.Components.CustomButton;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class Register extends JFrame {
 
-    JTextField txtNama;
-    JTextField txtUsername;
-    JPasswordField txtPassword;
+    private JTextField tfNama;
 
-    JButton btnRegister;
-    JButton btnLogin;
+    private JTextField tfUsername;
 
-    public Register(){
+    private JPasswordField pfPassword;
 
-        setTitle("Register");
-        setSize(400,350);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+    private JPasswordField pfConfirm;
+
+    private CustomButton btnRegister;
+
+    private JButton btnBack;
+
+    private ControllerUser controller;
+
+    public Register() {
+
+        controller = new ControllerUser();
+
+        initComponents();
+    }
+
+    private void initComponents() {
+
+        setTitle("Register - Lost & Found Kampus");
+
+        setSize(950,600);
+
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        JLabel title =
-                new JLabel("REGISTER");
+        setLayout(new GridLayout(1,2));
 
-        title.setFont(
-                new Font(
-                        "Segoe UI",
-                        Font.BOLD,
-                        22
+        // LEFT PANEL
+        JPanel leftPanel = new JPanel();
+
+        leftPanel.setBackground(new Color(241,245,249));
+
+        leftPanel.setLayout(new BoxLayout(
+                leftPanel,
+                BoxLayout.Y_AXIS
+        ));
+
+        leftPanel.add(Box.createVerticalGlue());
+
+        JLabel lblTitle = new JLabel(
+                "Buat Akun Baru"
+        );
+
+        lblTitle.setFont(
+                new Font("SansSerif", Font.BOLD, 30)
+        );
+
+        lblTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        leftPanel.add(lblTitle);
+
+        leftPanel.add(Box.createVerticalStrut(15));
+
+        JLabel lblDesc = new JLabel(
+                "Daftar untuk mulai menggunakan aplikasi."
+        );
+
+        lblDesc.setFont(
+                new Font("SansSerif", Font.PLAIN, 15)
+        );
+
+        lblDesc.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        leftPanel.add(lblDesc);
+
+        leftPanel.add(Box.createVerticalGlue());
+
+        add(leftPanel);
+
+        // RIGHT PANEL
+        JPanel rightPanel = new JPanel(
+                new GridBagLayout()
+        );
+
+        rightPanel.setBackground(Color.WHITE);
+
+        JPanel card = new JPanel();
+
+        card.setPreferredSize(new Dimension(360,420));
+
+        card.setBackground(Color.WHITE);
+
+        card.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(
+                                new Color(220,220,220)
+                        ),
+                        BorderFactory.createEmptyBorder(
+                                30,30,30,30
+                        )
                 )
         );
 
-        title.setBounds(120,20,200,30);
+        card.setLayout(new BoxLayout(
+                card,
+                BoxLayout.Y_AXIS
+        ));
 
-        JLabel lblNama =
-                new JLabel("Nama");
-
-        lblNama.setBounds(50,80,100,25);
-
-        txtNama = new JTextField();
-
-        txtNama.setBounds(150,80,180,25);
-
-        JLabel lblUsername =
-                new JLabel("Username");
-
-        lblUsername.setBounds(50,120,100,25);
-
-        txtUsername =
-                new JTextField();
-
-        txtUsername.setBounds(150,120,180,25);
-
-        JLabel lblPassword =
-                new JLabel("Password");
-
-        lblPassword.setBounds(50,160,100,25);
-
-        txtPassword =
-                new JPasswordField();
-
-        txtPassword.setBounds(150,160,180,25);
-
-        btnRegister =
-                new JButton("REGISTER");
-
-        btnRegister.setBounds(60,230,120,35);
-
-        btnLogin =
-                new JButton("LOGIN");
-
-        btnLogin.setBounds(200,230,120,35);
-
-        panel.add(title);
-        panel.add(lblNama);
-        panel.add(txtNama);
-        panel.add(lblUsername);
-        panel.add(txtUsername);
-        panel.add(lblPassword);
-        panel.add(txtPassword);
-        panel.add(btnRegister);
-        panel.add(btnLogin);
-
-        add(panel);
-
-        btnRegister.addActionListener(
-                e -> register()
+        JLabel lblRegister = new JLabel(
+                "Register"
         );
 
-        btnLogin.addActionListener(
-                e -> {
-
-                    dispose();
-
-                    new Login().setVisible(true);
-                }
+        lblRegister.setFont(
+                new Font("SansSerif", Font.BOLD, 22)
         );
+
+        lblRegister.setAlignmentX(
+                Component.CENTER_ALIGNMENT
+        );
+
+        card.add(lblRegister);
+
+        card.add(Box.createVerticalStrut(25));
+
+        card.add(new JLabel("Nama Lengkap"));
+
+        card.add(Box.createVerticalStrut(8));
+
+        tfNama = new JTextField();
+
+        tfNama.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE,40)
+        );
+
+        card.add(tfNama);
+
+        card.add(Box.createVerticalStrut(18));
+
+        card.add(new JLabel("Username"));
+
+        card.add(Box.createVerticalStrut(8));
+
+        tfUsername = new JTextField();
+
+        tfUsername.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE,40)
+        );
+
+        card.add(tfUsername);
+
+        card.add(Box.createVerticalStrut(18));
+
+        card.add(new JLabel("Password"));
+
+        card.add(Box.createVerticalStrut(8));
+
+        pfPassword = new JPasswordField();
+
+        pfPassword.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE,40)
+        );
+
+        card.add(pfPassword);
+
+        card.add(Box.createVerticalStrut(18));
+
+        card.add(new JLabel("Konfirmasi Password"));
+
+        card.add(Box.createVerticalStrut(8));
+
+        pfConfirm = new JPasswordField();
+
+        pfConfirm.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE,40)
+        );
+
+        card.add(pfConfirm);
+
+        card.add(Box.createVerticalStrut(28));
+
+        btnRegister = new CustomButton(
+                "REGISTER"
+        );
+
+        btnRegister.addActionListener(e -> register());
+
+        card.add(btnRegister);
+
+        card.add(Box.createVerticalStrut(15));
+
+        btnBack = new JButton(
+                "← Kembali ke Login"
+        );
+
+        btnBack.setBorderPainted(false);
+
+        btnBack.setContentAreaFilled(false);
+
+        btnBack.setForeground(
+                new Color(37,99,235)
+        );
+
+        btnBack.setCursor(
+                new Cursor(Cursor.HAND_CURSOR)
+        );
+
+        btnBack.addActionListener(e -> {
+
+            new Login().setVisible(true);
+
+            dispose();
+        });
+
+        card.add(btnBack);
+
+        rightPanel.add(card);
+
+        add(rightPanel);
+
+        setVisible(true);
     }
 
-    private void register(){
+    private void register() {
 
-        if(txtNama.getText().isEmpty()
-                || txtUsername.getText().isEmpty()
-                || txtPassword.getText().isEmpty()){
+        try {
+
+            controller.register(
+                    tfNama.getText(),
+                    tfUsername.getText(),
+                    String.valueOf(
+                            pfPassword.getPassword()
+                    ),
+                    String.valueOf(
+                            pfConfirm.getPassword()
+                    )
+            );
 
             JOptionPane.showMessageDialog(
                     this,
-                    "Data tidak boleh kosong"
+                    "Register berhasil!"
             );
 
-            return;
+            new Login().setVisible(true);
+
+            dispose();
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    e.getMessage()
+            );
         }
-
-        ModelUser user =
-                new ModelUser();
-
-        user.setNama(
-                txtNama.getText()
-        );
-
-        user.setUsername(
-                txtUsername.getText()
-        );
-
-        user.setPassword(
-                txtPassword.getText()
-        );
-
-        ControllerUser controller =
-                new ControllerUser();
-
-        controller.insert(user);
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Register berhasil"
-        );
-
-        dispose();
-
-        new Login().setVisible(true);
     }
 }

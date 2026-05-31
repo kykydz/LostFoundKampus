@@ -62,103 +62,52 @@ implements InterfaceDAOUser{
 
     @Override
     public ModelUser login(
-            String username,
-            String password
+        String username,
+        String password
     ) {
-
-        ModelUser user = null;
 
         try {
 
             String query =
                     "SELECT * FROM users "
-                    + "WHERE username=? "
-                    + "AND password=?";
+                  + "WHERE username=? AND password=?";
 
-            PreparedStatement ps =
+            PreparedStatement stmt =
                     connection.prepareStatement(query);
 
-            ps.setString(1,username);
-            ps.setString(2,password);
+            stmt.setString(1, username);
 
-            ResultSet rs =
-                    ps.executeQuery();
+            stmt.setString(2, password);
+
+            ResultSet rs = stmt.executeQuery();
 
             if(rs.next()){
 
-                user = new ModelUser();
+                ModelUser user = new ModelUser();
 
-                user.setId(
-                        rs.getInt("id")
-                );
+                user.setId(rs.getInt("id"));
 
                 user.setUsername(
                         rs.getString("username")
                 );
 
-                user.setNama(
-                        rs.getString("nama")
+                user.setPassword(
+                        rs.getString("password")
                 );
 
-                user.setRole(
-                        rs.getString("role")
-                );
+                return user;
             }
 
         } catch (Exception e) {
 
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
-        return user;
+        return null;
     }
 
     @Override
     public List<ModelUser> getAll() {
-
-        List<ModelUser> list =
-                new ArrayList<>();
-
-        try {
-
-            String query =
-                    "SELECT * FROM users";
-
-            Statement st =
-                    connection.createStatement();
-
-            ResultSet rs =
-                    st.executeQuery(query);
-
-            while(rs.next()){
-
-                ModelUser user =
-                        new ModelUser();
-
-                user.setId(
-                        rs.getInt("id")
-                );
-
-                user.setUsername(
-                        rs.getString("username")
-                );
-
-                user.setNama(
-                        rs.getString("nama")
-                );
-
-                user.setRole(
-                        rs.getString("role")
-                );
-
-                list.add(user);
-            }
-
-        } catch (Exception e) {
-
-            System.out.println(e.getMessage());
-        }
-
-        return list;
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

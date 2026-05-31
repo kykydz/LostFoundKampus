@@ -8,6 +8,9 @@ import Model.DatabaseConnection;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 /**
  *
  * @author Ivaa
@@ -21,6 +24,14 @@ public class DAOBarang implements InterfaceDAOBarang {
 
     @Override
     public void insert(ModelBarang barang) {
+        if(
+            barang.getNamaBarang() == null ||
+            barang.getNamaBarang().isEmpty()
+            ){
+            throw new IllegalArgumentException(
+                        "Nama barang wajib diisi!"
+            );
+            }
 
         try {
             String query = "INSERT INTO barang (nama_barang, kategori, "
@@ -213,4 +224,120 @@ public class DAOBarang implements InterfaceDAOBarang {
 
         return barang;
     }
+    public int getTotalBarang(){
+
+        try {
+
+            String query =
+                    "SELECT COUNT(*) as total "
+                  + "FROM barang";
+
+            Statement stmt =
+                    connection.createStatement();
+
+            ResultSet rs =
+                    stmt.executeQuery(query);
+
+            if(rs.next()){
+
+                return rs.getInt("total");
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+    public int getTotalByStatus(String status){
+
+        try {
+
+            String query =
+                    "SELECT COUNT(*) as total "
+                  + "FROM barang "
+                  + "WHERE status=?";
+
+            PreparedStatement stmt =
+                    connection.prepareStatement(query);
+
+            stmt.setString(1,status);
+
+            ResultSet rs =
+                    stmt.executeQuery();
+
+            if(rs.next()){
+
+                return rs.getInt("total");
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+    public List<ModelBarang> getReturnedBarang(){
+
+        List<ModelBarang> list =
+                new ArrayList<>();
+
+        try {
+
+            String query =
+                    "SELECT * FROM barang "
+                  + "WHERE status='Returned'";
+
+            Statement stmt =
+                    connection.createStatement();
+
+            ResultSet rs =
+                    stmt.executeQuery(query);
+
+            while(rs.next()){
+
+                ModelBarang barang =
+                        new ModelBarang();
+
+                barang.setId(
+                        rs.getInt("id")
+                );
+
+                barang.setNamaBarang(
+                        rs.getString("nama_barang")
+                );
+
+                barang.setKategori(
+                        rs.getString("kategori")
+                );
+
+                barang.setLokasi(
+                        rs.getString("lokasi")
+                );
+
+                barang.setStatus(
+                        rs.getString("status")
+                );
+                barang.setStatusClaim(
+                rs.getString("status_claim")
+                );
+
+                barang.setCreatedAt(
+                        rs.getString("created_at")
+                );
+
+                list.add(barang);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    
 }
